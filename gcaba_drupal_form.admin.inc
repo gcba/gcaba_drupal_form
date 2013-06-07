@@ -1,7 +1,7 @@
 <?php
 
 function gcaba_drupal_form_menu(){
-    
+
 	$items['admin/config/gcaba_drupal_form'] = array(
     'title' => 'GCABA Administrador de Formularios ',
     'position' => 'left',
@@ -16,12 +16,20 @@ function gcaba_drupal_form_menu(){
     'access arguments' => array('administer site configuration'),
     'description' => 'Administrar Formularios',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('gcaba_drupal_forms_admin'),
+    'page arguments' => array('gcaba_drupal_form_admin'),
     'title' => 'Administrar',
     'weight' => 10,
   );
+    $items['admin/config/gcaba_drupal_form/forms'] = array(
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Gestionar Formularios',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('gcaba_drupal_form_admin_forms'),
+    'title' => 'Gestionar',
+    'weight' => 10,
+  );
 
-	$items['admin/gcaba_forms/drupal_gcaba_do'] = array(
+	$items['admin/gcaba_drupal_form/drupal_gcaba_do'] = array(
     'access arguments' => array('administer site configuration'),
     'page callback' => 'gcaba_',
     'page arguments' => array(),
@@ -32,7 +40,7 @@ return $items;
 
 function gcaba_drupal_form_admin(){
 
-    $my_fields = field_info_instances("node", "shortcut");
+  /*  $my_fields = field_info_instances("node", "shortcut");
     //dpm($my_fields);  
     $info = field_info_field('field_imagen_list');
     //dpm($info);
@@ -54,7 +62,7 @@ function gcaba_drupal_form_admin(){
     '#type'  =>  'submit', 
     '#value'  =>  'Submit'
     );
-    return $form;
+    return $form;*/
 
 }
 
