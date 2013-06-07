@@ -8,7 +8,7 @@ function gcaba_drupal_form_admin_forms(){
 	$type = "gcaba_form_form"; 
 	$nodes = node_load_multiple(array(), array('type' => $type)); 
 
-	$content = "<table><tr><th>Formularios</th><th>Creador</th></tr>";
+	$content = "<table><tr><th>Forms</th><th>Creator</th></tr>";
 	foreach($nodes as $node){
 		$content .= "<tr><td>".$node->title."</td><td>".$node->name."</td></tr>";
 	}
@@ -31,9 +31,13 @@ function gcaba_drupal_form_admin_forms(){
 	$form['buttons']['#weight'] = 100;
 	$form['buttons']['submit'] = array(
 		'#type'  =>  'submit', 
-		'#value'  =>  t('Guardar')
+		'#value'  =>  t('Add form')
 	);
     
     return $form;
 }
 
+function gcaba_drupal_form_admin_forms_submit($form_id, &$form_state) {
+	// Add form
+	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/forms/add';
+}
