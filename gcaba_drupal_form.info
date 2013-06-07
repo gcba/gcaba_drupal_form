@@ -1,0 +1,3 @@
+name = GCABA Drupal Forms
+description = Permite generar formularios dinamicamente.
+core = 7.x
