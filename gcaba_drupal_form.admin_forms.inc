@@ -98,31 +98,24 @@ function gcaba_drupal_form_admin_forms_submit($form_id, &$form_state) {
 
 /**
  * Implementa hook_admin().
+ TERMINAR FORMULARIO
+
  */
 
 function gcaba_drupal_form_admin_fields(){
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
 		'#required' => true,
-		'#description' => t(''), 
+		'#description' => t('nombre del field que desea agregar'), 
 		'#title' => t("Nombre"),
 	);
 
+	$info = field_info_field('field_gcaba_form_field_type');
+	$values = $info['settings']['allowed_values'];
 	$form['selected'] = array(
        '#type' => 'select',
        '#title' => t('Tipo de dato'),
-       '#options' => array(
-         0 => t('TEXT'),
-         1 => t('TEXTAREA'),
-         2 => t('SELECT'),
-         3 => t('RADIO'),
-         4 => t('CHECKBOX'),
-         5 => t('TEXTAREA'),
-         6 => t('RECAPTCHA'),
-         7 => t('SUBMIT'),
-         8 => t('TEXTAREA'),
-         
-       ),
+       '#options' => $values,
        '#description' => t('Seleccione el tipo de campo.'),
    );
 
