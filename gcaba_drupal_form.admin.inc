@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 
 function gcaba_drupal_form_menu(){
 	$items['admin/config/gcaba_drupal_form'] = array(
@@ -54,3 +55,5 @@ function gcaba_shortcuts_admin(){
     '#value'  =>  'Submit'
     );
 return $form;
+=======
+>>>>>>> 166ba995edfd82fa1af59a7cc9d052598f79a518
