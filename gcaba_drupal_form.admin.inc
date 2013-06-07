@@ -14,18 +14,18 @@ function gcaba_drupal_form_menu(){
 
 	$items['admin/config/gcaba_drupal_form/administer'] = array(
     'access arguments' => array('administer site configuration'),
-    'description' => 'Administrar Formularios',
+    'description' => 'Administrar',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('gcaba_drupal_form_admin'),
-    'title' => 'Administrar',
+    'title' => 'Administrar Formularios',
     'weight' => 10,
   );
     $items['admin/config/gcaba_drupal_form/forms'] = array(
     'access arguments' => array('administer site configuration'),
-    'description' => 'Gestionar Formularios',
+    'description' => 'Gestionar',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('gcaba_drupal_form_admin_forms'),
-    'title' => 'Gestionar',
+    'title' => 'Gestionar Formularios',
     'weight' => 10,
   );
 
