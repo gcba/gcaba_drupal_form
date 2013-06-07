@@ -30,33 +30,5 @@ function gcaba_drupal_form_disable() {
 	
 }
 
-function gcaba_drupal_form_menu(){
-	$items['admin/config/gcaba_shortcuts'] = array(
-    'title' => 'GCABA Administrador de Formularios ',
-    'position' => 'left',
-    'weight' => -10,
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('access administration pages'),
-    'file path' => drupal_get_path('module', 'system'),
-    'file' => 'system.admin.inc',
-	);
-
-	$items['admin/config/gcaba_drupal_/administer'] = array(
-    'access arguments' => array('administer site configuration'),
-    'description' => 'Administrar Formularios',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('gcaba_drupal_forms_admin'),
-    'title' => 'Administrar',
-    'weight' => 10,
-  );
-
-	$items['admin/gcaba_forms/shortcuts_do'] = array(
-    'access arguments' => array('administer site configuration'),
-    'page callback' => 'gcaba_shortcuts_',
-    'page arguments' => array(),
-  );
-return $items;
-}
-
 
 ?>
