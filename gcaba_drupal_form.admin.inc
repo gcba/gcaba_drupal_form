@@ -39,6 +39,15 @@ function gcaba_drupal_form_menu(){
     'weight' => 10,
   );
 
+    $items['admin/config/gcaba_drupal_form/forms/add'] = array(
+    'access arguments' => array('administer site configuration'),
+    'description' => 'Add form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('gcaba_drupal_form_admin_forms_add'),
+    'title' => 'Add form',
+    'weight' => 10,
+  );
+
 	$items['admin/gcaba_drupal_form/drupal_gcaba_do'] = array(
     'access arguments' => array('administer site configuration'),
     'page callback' => 'gcaba_',
