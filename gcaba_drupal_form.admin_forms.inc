@@ -95,3 +95,39 @@ function gcaba_drupal_form_admin_forms_submit($form_id, &$form_state) {
 	// Add form
 	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/forms/add';
 }
+
+/**
+ * Implementa hook_admin().
+ */
+
+function gcaba_drupal_form_admin_fields(){
+	$form['fields']['title'] = array(
+		'#type' => 'textfield',
+		'#required' => true,
+		'#description' => t(''), 
+		'#title' => t("Nombre"),
+	);
+
+	$form['selected'] = array(
+       '#type' => 'select',
+       '#title' => t('Tipo de dato'),
+       '#options' => array(
+         0 => t('TEXT'),
+         1 => t('TEXTAREA'),
+         2 => t('SELECT'),
+         3 => t('RADIO'),
+         4 => t('CHECKBOX'),
+         5 => t('TEXTAREA'),
+         6 => t('RECAPTCHA'),
+         7 => t('SUBMIT'),
+         8 => t('TEXTAREA'),
+         
+       ),
+       '#description' => t('Seleccione el tipo de campo.'),
+   );
+
+return $form;
+
+}
+
+ 

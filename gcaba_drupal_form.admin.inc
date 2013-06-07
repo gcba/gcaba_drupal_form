@@ -26,8 +26,8 @@ function gcaba_drupal_form_menu(){
     'access arguments' => array('administer site configuration'),
     'description' => 'Administrar',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('gcaba_drupal_form_admin'),
-    'title' => 'Administrar Formularios',
+    'page arguments' => array('gcaba_drupal_form_admin_fields'),
+    'title' => 'Administrar Campos',
     'weight' => 10,
   );
     $items['admin/config/gcaba_drupal_form/forms'] = array(
@@ -68,8 +68,3 @@ function gcaba_drupal_form_admin(){
  * Implementa hook_admin().
  */
 
-function gcaba_drupal_form_admin_fields(){
-/*aun no hay opciones administrables*/
-}
-
- 
