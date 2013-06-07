@@ -1,1 +1,26 @@
 <?php
+
+/**
+ * Implementa hook_help().
+ */
+function gcaba_drupal_form_help($path, $arg) {
+  if ($path == 'admin/help#gcaba_drupal_form') {
+    return t('GCABA Drupal Forms.');
+  }
+}
+
+/**
+ * Implementa hook_enable().
+ */
+function gcaba_drupal_form_enable() {
+
+}
+
+/**
+ * Implementa hook_disable().
+ */
+function gcaba_drupal_form_disable() {
+
+}
+
+?>

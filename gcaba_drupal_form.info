@@ -1,3 +1,5 @@
 name = GCABA Drupal Forms
-description = Permite generar formularios dinamicamente.
+description = Permite generar formularios dinámicamente.
 core = 7.x
+package = GCABA Modules
+files[] = gcaba_drupal_form.module
