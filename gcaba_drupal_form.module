@@ -1,5 +1,7 @@
 <?php
 
+require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.schema.inc';
+
 /**
  * Implementa hook_help().
  */
@@ -14,6 +16,8 @@ function gcaba_drupal_form_help($path, $arg) {
  */
 function gcaba_drupal_form_enable() {
 
+	gcaba_drupal_form_create_schema();
+
 }
 
 /**
@@ -21,6 +25,8 @@ function gcaba_drupal_form_enable() {
  */
 function gcaba_drupal_form_disable() {
 
+	gcaba_drupal_form_remove_schema();
+	
 }
 
 ?>
