@@ -1,7 +1,7 @@
 <?php
-<<<<<<< HEAD
 
 function gcaba_drupal_form_menu(){
+    
 	$items['admin/config/gcaba_drupal_form'] = array(
     'title' => 'GCABA Administrador de Formularios ',
     'position' => 'left',
@@ -12,7 +12,7 @@ function gcaba_drupal_form_menu(){
     'file' => 'system.admin.inc',
 	);
 
-	$items['admin/config/gcaba_drupal_/administer'] = array(
+	$items['admin/config/gcaba_drupal_form/administer'] = array(
     'access arguments' => array('administer site configuration'),
     'description' => 'Administrar Formularios',
     'page callback' => 'drupal_get_form',
@@ -30,7 +30,7 @@ return $items;
 }
 
 
-function gcaba_shortcuts_admin(){
+function gcaba_drupal_form_admin(){
 
     $my_fields = field_info_instances("node", "shortcut");
     //dpm($my_fields);  
@@ -54,6 +54,7 @@ function gcaba_shortcuts_admin(){
     '#type'  =>  'submit', 
     '#value'  =>  'Submit'
     );
-return $form;
-=======
->>>>>>> 166ba995edfd82fa1af59a7cc9d052598f79a518
+    return $form;
+
+}
+
