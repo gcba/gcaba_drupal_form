@@ -1,13 +1,30 @@
 <?php
+function _cities_autocompletes(){
+    print "hello";
+}
+
 /*
 	Add forms
 */
+
+/**
+ * autocomplete helper
+ * $string = string for search
+ */
+function _fields_autocomplete($string) {
+	// Fields Content Types 
+	$type = "gcaba_form_field"; 
+	$nodes = node_load_multiple(array(), array('type' => $type)); 
+
+	print drupal_json_output($nodes);
+}
+
 function gcaba_drupal_form_admin_forms_add(){
 	// Form name
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
 		'#required' => true,
-		'#description' => t('Field name.'), 
+		'#description' => t('Form name.'), 
 		'#title' => t("Title"),
 	);
 
@@ -18,6 +35,14 @@ function gcaba_drupal_form_admin_forms_add(){
 		'#description' => t('Text to show on success form. Blank for default text.'), 
 		'#title' => "Success text",
 	);
+
+	$form['fields']['author'] = array(
+		'#type' => 'textfield',
+        '#title' => t('Authored by'),
+        '#size' => 30,
+        '#maxlength' => 60,
+        '#autocomplete_path' => 'fields/autocomplete',
+    );	
     
     return $form;
 }
