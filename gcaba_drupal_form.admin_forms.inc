@@ -1,24 +1,31 @@
 <?php
-function _cities_autocompletes(){
-    print "hello";
-}
-
-/*
-	Add forms
-*/
-
 /**
- * autocomplete helper
+ * Fields autocomplete helper
  * $string = string for search
  */
 function _fields_autocomplete($string) {
 	// Fields Content Types 
 	$type = "gcaba_form_field"; 
 	$nodes = node_load_multiple(array(), array('type' => $type)); 
+	$rta = array();
 
-	print drupal_json_output($nodes);
+	foreach ($nodes as $key => $value) {
+		if(!empty($string)){
+			if(stripos($value->title, $string) !== false ){
+				array_push($rta, $value->title);
+			}
+		}else{
+			array_push($rta, $value->title);
+		}
+		
+	}
+
+	print drupal_json_output( $rta );
 }
 
+/*
+	Add forms
+*/
 function gcaba_drupal_form_admin_forms_add(){
 	// Form name
 	$form['fields']['title'] = array(
@@ -38,10 +45,11 @@ function gcaba_drupal_form_admin_forms_add(){
 
 	$form['fields']['author'] = array(
 		'#type' => 'textfield',
-        '#title' => t('Authored by'),
+        '#title' => t('Field'),
         '#size' => 30,
         '#maxlength' => 60,
         '#autocomplete_path' => 'fields/autocomplete',
+        '#description' => t('Field type.'), 
     );	
     
     return $form;
