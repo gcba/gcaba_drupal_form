@@ -85,6 +85,7 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
 		}
 		
 	}
+
 	$table .= "</table>";
 	
 	// Form name
@@ -103,6 +104,7 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
 		'#title' => "Success text",
 	);
 
+   
 	$form['fields']['field_fields'] = array(
 		'#type' => 'textfield',
         '#title' => t('Field'),
@@ -222,10 +224,26 @@ function gcaba_drupal_form_admin_forms_submit($form_id, &$form_state) {
 
 /**
  * Implementa hook_admin().
- * TERMINAR FORMULARIO
+ *
  */
 
 function gcaba_drupal_form_admin_fields(){
+	$nodes = node_load_multiple(array(), array('type' => 'gcaba_form_field')); 
+	$content = "<table><tr><th>Campos</th><th>Creator</th></tr>";
+	foreach($nodes as $node){
+		$content .= "<tr><td>".$node->title."</td><td>".$node->name."</td></tr>";
+	}
+	$content .= "</table>";
+
+	$form['list'] = array(
+		'#markup' => $content
+	);
+
+	$form['title'] = array(
+		'#markup' => "<h1>Crear un nuevo campo</h1>"
+	);
+
+		
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
 		'#required' => true,
@@ -242,7 +260,89 @@ function gcaba_drupal_form_admin_fields(){
        '#description' => t('Seleccione el tipo de campo.'),
    );
 
+	$info = field_info_field('field_gcaba_form_validators');
+	$values = $info['settings']['allowed_values'];
+	
+	$form['validations'] = array(
+  '#type' => 'checkboxes',
+  '#options' => $values,
+  '#title' => t('Qué validaciones te gustarian agregar?'),
+    );
+
+	$form['fields']['placeholder'] = array(
+		'#type' => 'textfield',
+		'#required' => false,
+		'#description' => t('agregue el place holder del campo'), 
+		'#title' => t("Place Holder"),
+	);
+
+	$form['fields']['label'] = array(
+		'#type' => 'textfield',
+		'#required' => false,
+		'#description' => t('agregue el label del campo'), 
+		'#title' => t("Label"),
+	);
+
+	$form['fields']['tip'] = array(
+		'#type' => 'textfield',
+		'#required' => false,
+		'#description' => t('agregue una descripción del campo'), 
+		'#title' => t("Descripcion"),
+	);
+
+	$form['fields']['initial_value'] = array(
+		'#type' => 'textfield',
+		'#required' => false,
+		'#description' => t('agregue el valor por defecto del campo'), 
+		'#title' => t("Valor por defecto"),
+	);
+
+	$form['buttons'] = array();
+	$form['buttons']['#weight'] = 100;
+	$form['buttons']['submit'] = array(
+		'#type'  =>  'submit', 
+		'#value'  =>  t('Agregar Campo')
+	);
+	
+
+
 return $form;
 
 }
 
+
+function gcaba_drupal_form_admin_fields_submit($form_id, &$form_state) {
+	__save_field_node($form_state);
+	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/fields';
+}
+
+function __save_field_node($data){
+	$node = new stdClass();
+    $node->type = 'gcaba_form_field';
+    $node->language = LANGUAGE_NONE;
+    $node->status = 0;
+	$node->title = $data['values']['title'];
+	$node->field_gcaba_form_field_type[$node->language][0]['value'] = $data['values']['selected'];
+	__checkbox_format($node, $data['values']['validations']);
+	$node->field_gcaba_form_placeholder[$node->language][0]['value'] = $data['values']['placeholder'];
+	$node->field_gcaba_form_label[$node->language][0]['value'] = $data['values']['label'];
+	$node->field_gcaba_form_help[$node->language][0]['value'] = $data['values']['tip'];
+	$node->field_gcaba_form_initial_value[$node->language][0]['value'] = $data['values']['initial_value'];
+	$node->revision = 0;
+	$path = 'node_created_on' . date('YmdHis');
+	$node->path = array('alias' => $path);
+	if($node = node_submit($node)) { 
+    	node_save($node);
+	}
+
+}
+
+function __checkbox_format($node, $data){
+	$i=0;
+	foreach($data as $key => $value){
+		if($key == $value){
+			$node->field_gcaba_form_validators[$node->language][$i]['value'] = $value;
+			$i++;
+		}
+	}
+}
