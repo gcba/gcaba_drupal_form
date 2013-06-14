@@ -149,9 +149,6 @@ return $form;
 
 
 function gcaba_drupal_form_admin_fields_submit($form_id, &$form_state) {
-	// Add field
-	//echo "hola";
-	//print_r($form_state);
 	__save_field_node($form_state);
 	
 	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/fields';
@@ -163,11 +160,8 @@ function __save_field_node($data){
     $node->language = LANGUAGE_NONE;
     $node->status = 0;
 	$node->title = $data['values']['title'];
-	
 	$node->field_gcaba_form_field_type[$node->language][0]['value'] = $data['values']['selected'];
-	$node->field_gcaba_form_validators[$node->language][0]['values'] = $data['values']['validations'];
-	//print_r($data['values']['validations']);
-	//die();
+	__checkbox_format($node, $data['values']['validations']);
 	$node->field_gcaba_form_placeholder[$node->language][0]['value'] = $data['values']['placeholder'];
 	$node->field_gcaba_form_label[$node->language][0]['value'] = $data['values']['label'];
 	$node->field_gcaba_form_help[$node->language][0]['value'] = $data['values']['tip'];
@@ -175,11 +169,23 @@ function __save_field_node($data){
 	$node->revision = 0;
 	$path = 'node_created_on' . date('YmdHis');
 	$node->path = array('alias' => $path);
-
 	if($node = node_submit($node)) { // Prepare node for saving
     node_save($node);
-    echo "Node with nid " . $node->nid . " saved!\n";
-	die();
+    //echo "Node with nid " . $node->nid . " saved!\n";
+    //print_r($node);
+	//die();
 	}
 
+}
+
+function __checkbox_format($node, $data){
+	//print_r($data);
+	//die();
+	$i=0;
+	foreach($data as $key => $value){
+		if($key == $value){
+			$node->field_gcaba_form_validators[$node->language][$i]['value'] = $value;
+			$i++;
+		}
+	}
 }
