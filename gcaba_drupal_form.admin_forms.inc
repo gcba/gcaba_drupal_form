@@ -26,7 +26,40 @@ function _fields_autocomplete($string) {
 /*
 	Add forms
 */
-function gcaba_drupal_form_admin_forms_add(){
+function gcaba_drupal_form_admin_forms_add($form, &$form_state){
+	// JSON with Fields Nodes
+	$type = "gcaba_form_field"; 
+
+	// If not empty, user is addind a field
+	if(!empty($form_state['input']['field_fields'])){
+		$nodes = node_load_multiple(array(), array('type' => $type)); 
+		$doit = false;
+		foreach ($nodes as $key => $value) {
+			if($value->title == $form_state['input']['field_fields'] ){ 
+				$doit = true; 
+			}
+
+		}
+		// If field is valid, add to SESSION
+		if($doit == true && !in_array($value->title, $_SESSION['tmp_fields_list'])){
+			if(!isset($_SESSION['tmp_fields_list'])){
+				$_SESSION['tmp_fields_list'] = array();
+			}
+			array_push($_SESSION['tmp_fields_list'], $form_state['input']['field_fields']);
+		}else{
+			drupal_set_message(t('Field isn´t valid or it´s already added.'), 'error');
+		}
+		
+	}
+
+	if(!empty($_SESSION["tmp_fields_list"])){
+		$table = "<table><tr><th>Field</th></tr>";
+		foreach ($_SESSION["tmp_fields_list"] as $key => $value) {
+			$table .= "<tr><td>".$value."</td></tr>";
+		}
+		$table .= "</table>";
+	}
+
 	// Form name
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
@@ -43,7 +76,7 @@ function gcaba_drupal_form_admin_forms_add(){
 		'#title' => "Success text",
 	);
 
-	$form['fields']['author'] = array(
+	$form['fields']['field_fields'] = array(
 		'#type' => 'textfield',
         '#title' => t('Field'),
         '#size' => 30,
@@ -57,6 +90,11 @@ function gcaba_drupal_form_admin_forms_add(){
     	'#value' => t('Add field'),
     	'#weight' => 19,
 	);
+
+	$form['fields']['fields_table'] = array(
+		'#markup' => $table,
+	);
+
     return $form;
 }
 
