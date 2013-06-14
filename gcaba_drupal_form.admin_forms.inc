@@ -63,13 +63,11 @@ function gcaba_drupal_form_admin_forms_submit($form_id, &$form_state) {
 	// Add form
 	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/forms/add';
 }
-<<<<<<< HEAD
-=======
+
 
 /**
  * Implementa hook_admin().
- TERMINAR FORMULARIO
-
+ * TERMINAR FORMULARIO
  */
 
 function gcaba_drupal_form_admin_fields(){
@@ -93,5 +91,3 @@ return $form;
 
 }
 
- 
->>>>>>> 98b48a8b7070a4b814ddffc59da7a4c7c640eb35

@@ -21,12 +21,12 @@ function gcaba_drupal_form_block_view($delta = '') {
 
   //TOOD no llega a este hook cuando renderiza, revisar
 
-  $delta = split('-', $delta);
+  $delta = explode('-', $delta);
 
   $block = array();
-  $block['content'] = 
-  '<p>ID:'+$delta[1]+'</p>'.
-  '<p>NOMBRE:'+$delta[2]+'</p>';
+  $block['content'] = json_encode($delta);
+/*  '<p>ID:'+$delta[1]+'</p>'.
+  '<p>NOMBRE:'+$delta[2]+'</p>';*/
 
   return $block;
 }
