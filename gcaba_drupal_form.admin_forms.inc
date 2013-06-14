@@ -1,8 +1,4 @@
 <?php
-/*
-	Add forms
-*/
-function gcaba_drupal_form_admin_forms_add(){
 /**
  * Fields autocomplete helper
  * $string = string for search
@@ -149,10 +145,26 @@ function gcaba_drupal_form_admin_forms_submit($form_id, &$form_state) {
 
 /**
  * Implementa hook_admin().
- * TERMINAR FORMULARIO
+ *
  */
 
 function gcaba_drupal_form_admin_fields(){
+	$nodes = node_load_multiple(array(), array('type' => 'gcaba_form_field')); 
+	$content = "<table><tr><th>Campos</th><th>Creator</th></tr>";
+	foreach($nodes as $node){
+		$content .= "<tr><td>".$node->title."</td><td>".$node->name."</td></tr>";
+	}
+	$content .= "</table>";
+
+	$form['list'] = array(
+		'#markup' => $content
+	);
+
+	$form['title'] = array(
+		'#markup' => "<h1>Crear un nuevo campo</h1>"
+	);
+
+		
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
 		'#required' => true,
@@ -212,7 +224,7 @@ function gcaba_drupal_form_admin_fields(){
 		'#type'  =>  'submit', 
 		'#value'  =>  t('Agregar Campo')
 	);
-
+	
 
 
 return $form;
@@ -222,7 +234,6 @@ return $form;
 
 function gcaba_drupal_form_admin_fields_submit($form_id, &$form_state) {
 	__save_field_node($form_state);
-	
 	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/fields';
 }
 
@@ -241,18 +252,13 @@ function __save_field_node($data){
 	$node->revision = 0;
 	$path = 'node_created_on' . date('YmdHis');
 	$node->path = array('alias' => $path);
-	if($node = node_submit($node)) { // Prepare node for saving
-    node_save($node);
-    //echo "Node with nid " . $node->nid . " saved!\n";
-    //print_r($node);
-	//die();
+	if($node = node_submit($node)) { 
+    	node_save($node);
 	}
 
 }
 
 function __checkbox_format($node, $data){
-	//print_r($data);
-	//die();
 	$i=0;
 	foreach($data as $key => $value){
 		if($key == $value){
@@ -261,4 +267,3 @@ function __checkbox_format($node, $data){
 		}
 	}
 }
-
