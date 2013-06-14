@@ -34,6 +34,49 @@ function gcaba_drupal_form_get_fields_base() {
 
   $field_bases = array();
 
+  // Exported field_base: 'field_field_gcaba_form_options'
+  $field_bases['field_field_gcaba_form_options'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_field_gcaba_form_options',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'text_long',
+  );
+
+  // Exported field_base: 'field_field_gcaba_form_order'
+  $field_bases['field_field_gcaba_form_order'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_field_gcaba_form_order',
+    'foreign keys' => array(),
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'number_integer',
+  );
+
   // Exported field_base: 'field_gcaba_form_data'
   $field_bases['field_gcaba_form_data'] = array(
     'active' => 1,
@@ -363,7 +406,7 @@ function gcaba_drupal_form_get_fields_base() {
 }
 
 function gcaba_drupal_form_get_field_instances() {
-  $field_instances = array();
+   $field_instances = array();
 
   // Exported field_instance: 'node-gcaba_form_data-field_gcaba_form_data'
   $field_instances['node-gcaba_form_data-field_gcaba_form_data'] = array(
@@ -493,6 +536,104 @@ function gcaba_drupal_form_get_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-gcaba_form_field-field_field_gcaba_form_options'
+  $field_instances['node-gcaba_form_field-field_field_gcaba_form_options'] = array(
+    'bundle' => 'gcaba_form_field',
+    'default_value' => array(
+      0 => array(
+        'value' => '1|SI
+0|NO',
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Contendrá las opciones con el formato: key|value
+Ej:
+3|Verde
+5|Verde claro',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_field_gcaba_form_options',
+    'label' => 'Options',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 10,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-gcaba_form_field-field_field_gcaba_form_order'
+  $field_instances['node-gcaba_form_field-field_field_gcaba_form_order'] = array(
+    'bundle' => 'gcaba_form_field',
+    'default_value' => array(
+      0 => array(
+        'value' => 1,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Order in form',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => ' ',
+        ),
+        'type' => 'number_integer',
+        'weight' => 8,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_field_gcaba_form_order',
+    'label' => 'Order',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 9,
+    ),
+  );
+
   // Exported field_instance: 'node-gcaba_form_field-field_gcaba_form_field_type'
   $field_instances['node-gcaba_form_field-field_gcaba_form_field_type'] = array(
     'bundle' => 'gcaba_form_field',
@@ -526,7 +667,7 @@ function gcaba_drupal_form_get_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => -3,
+      'weight' => 2,
     ),
   );
 
@@ -566,7 +707,7 @@ function gcaba_drupal_form_get_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 1,
+      'weight' => 7,
     ),
   );
 
@@ -606,7 +747,7 @@ function gcaba_drupal_form_get_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 2,
+      'weight' => 8,
     ),
   );
 
@@ -646,7 +787,7 @@ function gcaba_drupal_form_get_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 0,
+      'weight' => 6,
     ),
   );
 
@@ -686,7 +827,7 @@ function gcaba_drupal_form_get_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => -1,
+      'weight' => 5,
     ),
   );
 
@@ -723,7 +864,7 @@ function gcaba_drupal_form_get_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_buttons',
-      'weight' => -2,
+      'weight' => 4,
     ),
   );
 
@@ -818,9 +959,15 @@ function gcaba_drupal_form_get_field_instances() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Body');
-  t('Description');
+  t('Contendrá las opciones con el formato: key|value
+Ej:
+3|Verde
+5|Verde claro');
   t('Initial Value');
   t('Label');
+  t('Options');
+  t('Order');
+  t('Order in form');
   t('Placerholder');
   t('Tip text');
   t('Type');
@@ -830,6 +977,8 @@ function gcaba_drupal_form_get_field_instances() {
   t('gcaba_form_fields');
   t('gcaba_form_form_id');
   t('gcaba_form_success_text');
+
+  return $field_instances;
 
   return $field_instances;
 }
