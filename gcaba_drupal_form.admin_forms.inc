@@ -77,7 +77,7 @@ function _fields_autocomplete($string) {
 */
 function gcaba_drupal_form_admin_forms_add($form, &$form_state){
 	// Draw the field s table
-	$table = "<table name='table_fields' id='table_fields'><tr><th>Field</th></tr>";
+	$table = "<table name='table_fields' id='table_fields'><tr><th>". t("Field")."</th></tr>";
 	if(!empty($_SESSION["tmp_fields_list"])){
 		
 		foreach ($_SESSION["tmp_fields_list"] as $key => $value) {
@@ -136,7 +136,6 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
     	'#value' => t('Crear formulario'),
     	'#weight' => 19,
 	);
-
     return $form;
 }
 
@@ -151,13 +150,13 @@ function gcaba_drupal_form_admin_forms_add_validate($form, &$form_state){
 	$doit = true;
 	foreach ($nodes_form as $key => $value) {
 		if($value->title == $form_state['input']['title'] ){ 
-			form_set_error($name = "title", $message = 'Title is already taken.');
+			form_set_error($name = "title", $message = t('Title is already taken.'));
 		}
 	}
 
 	// Verify that fields were added to form
 	if($_SESSION['tmp_fields_list'] == null || $_SESSION['tmp_fields_list'] == array()){
-		form_set_error($name = "field_fields", $message = 'There are no fields added');
+		form_set_error($name = "field_fields", $message = t('There are no fields added'));
 	}
 }
 
@@ -176,6 +175,7 @@ function gcaba_drupal_form_admin_forms_add_submit($form, &$form_state){
 	// Clean SESSION
 	$_SESSION['tmp_fields_list'] = array();
 
+	// Redirect to list
 	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/forms/';
 }
 
