@@ -1,4 +1,53 @@
 <?php
+
+function _add_field_to_form_callback(){
+	if(!isset($_SESSION["tmp_fields_list"])){
+	    $_SESSION["tmp_fields_list"] = array();
+    }
+
+	// Get form data
+	list($form, $form_state) = ajax_get_form();
+
+	if(!empty($form_state['input']['field_fields'])){
+		// Validate field existance
+		$type = "gcaba_form_field"; 
+		$nodes = node_load_multiple(array(), array('type' => $type)); 
+		$doit = false;
+		foreach ($nodes as $key => $value) {
+			if($value->title == $form_state['input']['field_fields'] ){ 
+				$doit = true; 
+			}
+		}
+
+		// Verify duplicated field
+		if(in_array($form_state['input']['field_fields'], $_SESSION["tmp_fields_list"])){
+			$doit = false;
+		}
+
+		// Add to SESSION if it´s validated
+		if($doit == true){
+			array_push($_SESSION["tmp_fields_list"], $form_state['input']['field_fields']);
+		}
+	}
+
+	// Draw the field s table
+	$table = "<table name='table_fields' id='table_fields'><tr><th>Field</th></tr>";
+	if(!empty($_SESSION["tmp_fields_list"])){
+		foreach ($_SESSION["tmp_fields_list"] as $key => $value) {
+			$table .= "<tr><td>".$value."</td></tr>";
+		}
+	}
+	$table .= "</table>";
+
+	return array(
+		'#type' => 'ajax',
+		'#commands' => array(
+			ajax_command_replace('#table_fields', $table),
+		)
+	);
+}
+
+
 /**
  * Fields autocomplete helper
  * $string = string for search
@@ -27,39 +76,17 @@ function _fields_autocomplete($string) {
 	Add forms
 */
 function gcaba_drupal_form_admin_forms_add($form, &$form_state){
-	// JSON with Fields Nodes
-	$type = "gcaba_form_field"; 
-
-	// If not empty, user is addind a field
-	if(!empty($form_state['input']['field_fields'])){
-		$nodes = node_load_multiple(array(), array('type' => $type)); 
-		$doit = false;
-		foreach ($nodes as $key => $value) {
-			if($value->title == $form_state['input']['field_fields'] ){ 
-				$doit = true; 
-			}
-
-		}
-		// If field is valid, add to SESSION
-		if($doit == true && !in_array($value->title, $_SESSION['tmp_fields_list'])){
-			if(!isset($_SESSION['tmp_fields_list'])){
-				$_SESSION['tmp_fields_list'] = array();
-			}
-			array_push($_SESSION['tmp_fields_list'], $form_state['input']['field_fields']);
-		}else{
-			drupal_set_message(t('Field isn´t valid or it´s already added.'), 'error');
-		}
-		
-	}
-
+	// Draw the field s table
+	$table = "<table name='table_fields' id='table_fields'><tr><th>Field</th></tr>";
 	if(!empty($_SESSION["tmp_fields_list"])){
-		$table = "<table><tr><th>Field</th></tr>";
+		
 		foreach ($_SESSION["tmp_fields_list"] as $key => $value) {
 			$table .= "<tr><td>".$value."</td></tr>";
 		}
-		$table .= "</table>";
+		
 	}
-
+	$table .= "</table>";
+	
 	// Form name
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
@@ -83,19 +110,71 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
         '#maxlength' => 60,
         '#autocomplete_path' => 'fields/autocomplete',
         '#description' => t('Field type.'), 
+        '#default' => "",
     );	
     
     $form['fields']['add'] = array(
     	'#type' => 'button', 
     	'#value' => t('Add field'),
     	'#weight' => 19,
+    	'#ajax' => array(
+			'callback' => '_add_field_to_form_callback',
+			'wrapper' => 'fields_table',
+			'effect' => 'fade',
+     	),
 	);
 
 	$form['fields']['fields_table'] = array(
 		'#markup' => $table,
 	);
 
+
+    $form['fields']['submit'] = array(
+    	'#type' => 'submit', 
+    	'#value' => t('Crear formulario'),
+    	'#weight' => 19,
+	);
+
     return $form;
+}
+
+/*
+	Add forms validate
+*/
+function gcaba_drupal_form_admin_forms_add_validate($form, &$form_state){ 
+	
+	// Verify that forms name is available
+	$type_form = "gcaba_form_form"; 
+	$nodes_form = node_load_multiple(array(), array('type' => $type_form));
+	$doit = true;
+	foreach ($nodes_form as $key => $value) {
+		if($value->title == $form_state['input']['title'] ){ 
+			form_set_error($name = "title", $message = 'Title is already taken.');
+		}
+	}
+
+	// Verify that fields were added to form
+	if($_SESSION['tmp_fields_list'] == null || $_SESSION['tmp_fields_list'] == array()){
+		form_set_error($name = "field_fields", $message = 'There are no fields added');
+	}
+}
+
+/*
+	Add forms validate
+*/
+function gcaba_drupal_form_admin_forms_add_submit($form, &$form_state){
+	// Create node object.
+	$node = new StdClass();
+	$node->type = 'gcaba_form_form';
+	$node->language = LANGUAGE_NONE;
+	node_object_prepare($node);
+	$node->title = $form_state['input']['title'];
+	node_save($node);
+	
+	// Clean SESSION
+	$_SESSION['tmp_fields_list'] = array();
+
+	$form_state['redirect'] = '/admin/config/gcaba_drupal_form/forms/';
 }
 
 /*
