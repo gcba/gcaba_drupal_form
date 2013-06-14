@@ -4,7 +4,7 @@
  * $string = string for search
  */
 function _fields_autocomplete($string) {
-	// Fields Content Types 
+	// JSON with Fields Nodes
 	$type = "gcaba_form_field"; 
 	$nodes = node_load_multiple(array(), array('type' => $type)); 
 	$rta = array();
@@ -12,10 +12,10 @@ function _fields_autocomplete($string) {
 	foreach ($nodes as $key => $value) {
 		if(!empty($string)){
 			if(stripos($value->title, $string) !== false ){
-				array_push($rta, $value->title);
+				$rta[$value->title] = $value->title;
 			}
 		}else{
-			array_push($rta, $value->title);
+			$rta[$value->title] = $value->title;
 		}
 		
 	}
@@ -52,6 +52,11 @@ function gcaba_drupal_form_admin_forms_add(){
         '#description' => t('Field type.'), 
     );	
     
+    $form['fields']['add'] = array(
+    	'#type' => 'button', 
+    	'#value' => t('Add field'),
+    	'#weight' => 19,
+	);
     return $form;
 }
 
