@@ -2,16 +2,24 @@
 /**
  * Implementa hook_menu().
  */
+
 function gcaba_drupal_form_menu(){
 
+    $items['fields/autocomplete'] = array(
+        'title' => 'Autocomplete for fields',
+        'page callback' => '_fields_autocomplete',
+        'access callback' => true, //TODO: Verify access
+        'type' => MENU_CALLBACK
+    );
+    
 	$items['admin/config/gcaba_drupal_form'] = array(
-    'title' => 'GCABA Administrador de Formularios ',
-    'position' => 'left',
-    'weight' => -10,
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('access administration pages'),
-    'file path' => drupal_get_path('module', 'system'),
-    'file' => 'system.admin.inc',
+        'title' => 'GCABA Administrador de Formularios ',
+        'position' => 'left',
+        'weight' => -10,
+        'page callback' => 'system_admin_menu_block_page',
+        'access arguments' => array('access administration pages'),
+        'file path' => drupal_get_path('module', 'system'),
+        'file' => 'system.admin.inc',
 	);
 
 	$items['admin/config/gcaba_drupal_form/administer'] = array(

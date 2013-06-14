@@ -6,10 +6,20 @@
 function gcaba_drupal_form_block_info() {
   //TODO buscar todos los creados por el módulo y agregarlos.
  
-  $blocks['bloque1'] = array(
-    'info' => t('bloque 1'), 
-    'cache' => DRUPAL_NO_CACHE,
-  );
+  $nids = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->fields('n', array('title'))
+    ->condition('n.type', 'gcaba_form_form')
+    ->execute()
+    ->fetchAll();
+
+  foreach ($nids as $key => $form) {
+    $identifier = 'GCABAForm-'.$form->nid;
+    $blocks[$identifier] = array(
+      'info' => 'GCABA Drupal Form: '.$form->title, 
+      'cache' => DRUPAL_NO_CACHE
+    );
+  }
 
   return $blocks;
 }
@@ -18,30 +28,32 @@ function gcaba_drupal_form_block_info() {
  * Implementa hook_view().
  */
 function gcaba_drupal_form_block_view($delta = '') {
+  $delta = explode('-', $delta);
+  $block['content'] = '';
 
-  //TOOD no llega a este hook cuando renderiza, revisar
-
-  $delta = split('-', $delta);
-
-  $block = array();
-  $block['content'] = 
-  '<p>ID:'+$delta[1]+'</p>'.
-  '<p>NOMBRE:'+$delta[2]+'</p>';
+  if($delta[0] && $delta[0]=='GCABAForm')
+      $block['content'] = gcaba_drupal_form_render_form($delta[1]);
 
   return $block;
 }
 
+function gcaba_drupal_form_render_form($nodeId) {
+  $formData = node_load($nodeId);
+  return json_encode($formData);
+}
 
-//Ejemplo de uso - gcaba_drupal_insert_block_form(44,'Bloque de Test');
 
-function gcaba_drupal_insert_block($id,$title) {
+
+//Ejemplo de uso - gcaba_drupal_form_insert_block(44,'Bloque de Test');
+
+/*function gcaba_drupal_form_insert_block($id,$title) {
   //graba pero tiene algún problema porque no llama al hook block_view de arriba
 
   $identifier = 'GCABAForm-'.$id.'-'.$title;
 
   $delta = db_insert('block_custom')->fields(array(
-    'body' => $identifier,
     'info' => $identifier,
+    'body' => 'Formulario creado con GCABA Drupal Form: ID:'.$id.' - NOMBRE:'.$title,
     'format' => 'filtered_html',
   ))->execute();
 
@@ -64,19 +76,8 @@ function gcaba_drupal_insert_block($id,$title) {
     }
     $query->execute();
 
-
-/*$query = db_insert('block_role')->fields(array('rid', 'module', 'delta'));
-  foreach (array_filter($form_state['values']['roles']) as $rid) {
-    $query->values(array(
-      'rid' => $rid,
-      'module' => $form_state['values']['module'],
-      'delta' => $delta,
-    ));
-  }
-  $query->execute();*/
-
 }
-
+*/
 
 
 ?>
