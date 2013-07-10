@@ -31,7 +31,7 @@ function _add_field_to_form_callback(){
 	}
 
 	// Draw the field s table
-	$table = "<table name='table_fields' id='table_fields'><tr><th>Field</th></tr>";
+	$table = "<table name='table_fields' id='table_fields'><tr><th>".t('Field')."</th></tr>";
 	if(!empty($_SESSION["tmp_fields_list"])){
 		foreach ($_SESSION["tmp_fields_list"] as $key => $value) {
 			$table .= "<tr><td>".$value."</td></tr>";

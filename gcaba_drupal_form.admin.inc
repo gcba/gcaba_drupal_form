@@ -6,14 +6,14 @@
 function gcaba_drupal_form_menu(){
 
     $items['fields/autocomplete'] = array(
-        'title' => 'Autocomplete for fields',
+        'title' => t('Fields s Autocompleter'),
         'page callback' => '_fields_autocomplete',
         'access callback' => true, //TODO: Verify access
         'type' => MENU_CALLBACK
     );
     
 	$items['admin/config/gcaba_drupal_form'] = array(
-        'title' => 'GCABA Administrador de Formularios ',
+        'title' => t('Manage forms'),
         'position' => 'left',
         'weight' => -10,
         'page callback' => 'system_admin_menu_block_page',
@@ -24,35 +24,35 @@ function gcaba_drupal_form_menu(){
 
 	$items['admin/config/gcaba_drupal_form/administer'] = array(
     'access arguments' => array('administer site configuration'),
-    'description' => 'Administrar',
+    'description' => t('Global forms configuration'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('gcaba_drupal_form_admin'),
-    'title' => 'Administrar Formularios',
+    'title' => t('Forms configuration'),
     'weight' => 10,
   );
     $items['admin/config/gcaba_drupal_form/fields'] = array(
     'access arguments' => array('administer site configuration'),
-    'description' => 'Administrar',
+    'description' => t('Add, modify and delete fields'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('gcaba_drupal_form_admin_fields'),
-    'title' => 'Administrar Campos',
+    'title' => t('Manage fields'),
     'weight' => 10,
   );
     $items['admin/config/gcaba_drupal_form/forms'] = array(
     'access arguments' => array('administer site configuration'),
-    'description' => 'Gestionar',
+    'description' => t('Add, modify and delete forms'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('gcaba_drupal_form_admin_forms'),
-    'title' => 'Gestionar Formularios',
+    'title' => t('Manage forms'),
     'weight' => 10,
   );
 
     $items['admin/config/gcaba_drupal_form/forms/add'] = array(
     'access arguments' => array('administer site configuration'),
-    'description' => 'Add form',
+    'description' => t('Add form'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('gcaba_drupal_form_admin_forms_add'),
-    'title' => 'Add form',
+    'title' => t('Add form'),
     'weight' => 10,
   );
 
@@ -69,7 +69,12 @@ return $items;
  */
 
 function gcaba_drupal_form_admin(){
-/*aun no hay opciones administrables*/
+    $html = '<h2>'.t('No settings, yet').'</h2>';
+    $form['fields']['fields_table'] = array(
+        '#markup' => $html,
+    );
+
+    return $form;
 }
 
 /**
