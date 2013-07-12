@@ -92,7 +92,7 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
 		'#required' => true,
-		'#description' => t('Form name.'), 
+		'#description' => t('Form name'), 
 		'#title' => t("Title"),
 	);
 
@@ -111,7 +111,7 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
         '#size' => 30,
         '#maxlength' => 60,
         '#autocomplete_path' => 'fields/autocomplete',
-        '#description' => t('Field type.'), 
+        '#description' => t('Field type'), 
         '#default' => "",
     );	
     
@@ -133,7 +133,7 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
 
     $form['fields']['submit'] = array(
     	'#type' => 'submit', 
-    	'#value' => t('Crear formulario'),
+    	'#value' => t('Create form'),
     	'#weight' => 19,
 	);
     return $form;
@@ -187,7 +187,7 @@ function gcaba_drupal_form_admin_forms(){
 	$type = "gcaba_form_form"; 
 	$nodes = node_load_multiple(array(), array('type' => $type)); 
 
-	$content = "<table><tr><th>Forms</th><th>Creator</th></tr>";
+	$content = "<table><tr><th>".t("Forms")."</th><th>".t("Creator")."</th></tr>";
 	foreach($nodes as $node){
 		$content .= "<tr><td>".$node->title."</td><td>".$node->name."</td></tr>";
 	}
@@ -198,7 +198,7 @@ function gcaba_drupal_form_admin_forms(){
 	$form['#id'] = 'form_list';
 
 	$form['header'] = array(
-		'#markup' => "<h2>Form list</h2>"
+		'#markup' => "<h2>".t("Form list")."</h2>"
 	);
 
 	$form['list'] = array(
@@ -229,7 +229,7 @@ function gcaba_drupal_form_admin_forms_submit($form_id, &$form_state) {
 
 function gcaba_drupal_form_admin_fields(){
 	$nodes = node_load_multiple(array(), array('type' => 'gcaba_form_field')); 
-	$content = "<table><tr><th>Campos</th><th>Creator</th></tr>";
+	$content = "<table><tr><th>".t("Fields")."</th><th>".t("Creator")."</th></tr>";
 	foreach($nodes as $node){
 		$content .= "<tr><td>".$node->title."</td><td>".$node->name."</td></tr>";
 	}
@@ -240,74 +240,71 @@ function gcaba_drupal_form_admin_fields(){
 	);
 
 	$form['title'] = array(
-		'#markup' => "<h1>Crear un nuevo campo</h1>"
+		'#markup' => "<h1>".t("Add field")."</h1>"
 	);
 
 		
 	$form['fields']['title'] = array(
 		'#type' => 'textfield',
 		'#required' => true,
-		'#description' => t('nombre del field que desea agregar'), 
-		'#title' => t("Nombre"),
+		'#description' => t('Field name'), 
+		'#title' => t("Field name"),
 	);
 
 	$info = field_info_field('field_gcaba_form_field_type');
 	$values = $info['settings']['allowed_values'];
 	$form['selected'] = array(
        '#type' => 'select',
-       '#title' => t('Tipo de dato'),
+       '#title' => t('Data type'),
        '#options' => $values,
-       '#description' => t('Seleccione el tipo de campo.'),
+       '#description' => t('Select data type'),
    );
 
 	$info = field_info_field('field_gcaba_form_validators');
 	$values = $info['settings']['allowed_values'];
 	
 	$form['validations'] = array(
-  '#type' => 'checkboxes',
-  '#options' => $values,
-  '#title' => t('Qué validaciones te gustarian agregar?'),
+  		'#type' => 'checkboxes',
+  		'#options' => $values,
+  		'#title' => t('Add some validations'),
     );
 
 	$form['fields']['placeholder'] = array(
 		'#type' => 'textfield',
 		'#required' => false,
-		'#description' => t('agregue el place holder del campo'), 
-		'#title' => t("Place Holder"),
+		'#description' => t('Field placeholder'), 
+		'#title' => t("Field placeholder"),
 	);
 
 	$form['fields']['label'] = array(
 		'#type' => 'textfield',
 		'#required' => false,
-		'#description' => t('agregue el label del campo'), 
-		'#title' => t("Label"),
+		'#description' => t('Field label'), 
+		'#title' => t("Field label"),
 	);
 
 	$form['fields']['tip'] = array(
 		'#type' => 'textfield',
 		'#required' => false,
-		'#description' => t('agregue una descripción del campo'), 
-		'#title' => t("Descripcion"),
+		'#description' => t('Field description'), 
+		'#title' => t("Field description"),
 	);
 
 	$form['fields']['initial_value'] = array(
 		'#type' => 'textfield',
 		'#required' => false,
-		'#description' => t('agregue el valor por defecto del campo'), 
-		'#title' => t("Valor por defecto"),
+		'#description' => t('Field default value'), 
+		'#title' => t("Field default value"),
 	);
 
 	$form['buttons'] = array();
 	$form['buttons']['#weight'] = 100;
 	$form['buttons']['submit'] = array(
 		'#type'  =>  'submit', 
-		'#value'  =>  t('Agregar Campo')
+		'#value'  =>  t('Add field')
 	);
-	
 
-
-return $form;
-
+	return $form;
 }
 
 
@@ -331,6 +328,7 @@ function __save_field_node($data){
 	$node->revision = 0;
 	$path = 'node_created_on' . date('YmdHis');
 	$node->path = array('alias' => $path);
+	node_object_prepare($node);
 	if($node = node_submit($node)) { 
     	node_save($node);
 	}
