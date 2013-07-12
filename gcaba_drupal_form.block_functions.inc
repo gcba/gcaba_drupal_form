@@ -131,7 +131,18 @@ function gcaba_drupal_form_render_fields($form,$nodeData){
       case 'SELECT':
         $form = gcaba_drupal_form_render_field_select($v,$form);
         break;
-
+      case 'TEXTAREA':
+        $form = gcaba_drupal_form_render_field_textarea($v,$form);
+        break;
+      case 'RADIO':
+        $form = gcaba_drupal_form_render_field_radio($v,$form);
+        break;
+      case 'CHECKBOX':
+        $form = gcaba_drupal_form_render_field_checkbox($v,$form);
+        break;
+      case 'RECAPTCHA':
+        $form = gcaba_drupal_form_render_field_recaptcha($v,$form);
+        break;
       //TODO los otros tipos
       
     }

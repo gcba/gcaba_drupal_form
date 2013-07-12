@@ -76,6 +76,8 @@ function _fields_autocomplete($string) {
 	Add forms
 */
 function gcaba_drupal_form_admin_forms_add($form, &$form_state){
+	// TODO: Add text for submit button
+
 	// Draw the field s table
 	$table = "<table name='table_fields' id='table_fields'><tr><th>". t("Field")."</th></tr>";
 	if(!empty($_SESSION["tmp_fields_list"])){
@@ -253,6 +255,13 @@ function gcaba_drupal_form_admin_fields(){
 
 	$info = field_info_field('field_gcaba_form_field_type');
 	$values = $info['settings']['allowed_values'];
+
+	// Avoid SUBMIT type
+	$key = array_search("SUBMIT",$values);
+	if($key!==false){
+	    unset($values[$key]);
+	}
+
 	$form['selected'] = array(
        '#type' => 'select',
        '#title' => t('Data type'),
@@ -297,6 +306,13 @@ function gcaba_drupal_form_admin_fields(){
 		'#title' => t("Field default value"),
 	);
 
+	$form['fields']['options'] = array(
+		'#type' => 'textarea',
+		'#required' => false,
+		'#description' => t('Field options. Noy valid for all types.'), 
+		'#title' => t("Field options"),
+	);
+
 	$form['buttons'] = array();
 	$form['buttons']['#weight'] = 100;
 	$form['buttons']['submit'] = array(
@@ -325,6 +341,7 @@ function __save_field_node($data){
 	$node->field_gcaba_form_label[$node->language][0]['value'] = $data['values']['label'];
 	$node->field_gcaba_form_help[$node->language][0]['value'] = $data['values']['tip'];
 	$node->field_gcaba_form_initial_value[$node->language][0]['value'] = $data['values']['initial_value'];
+	$node->field_field_gcaba_form_options[$node->language][0]['value'] = $data['values']['options'];
 	$node->revision = 0;
 	$path = 'node_created_on' . date('YmdHis');
 	$node->path = array('alias' => $path);
