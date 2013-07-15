@@ -16,13 +16,13 @@ function gcaba_drupal_form_render_field_text($field, $form) {
   return $form;
 }
 
-function gcaba_drupal_form_render_field_select($field,$form) {
+function gcaba_drupal_form_render_field_select($field, $form) {
   // TODO: Se muestra pero no muestra <options>
   $form['gcaba_drupal_form_render_field_select_'.$field['id'] ] = array(
     '#title' => $field['title'],
     '#type' => 'select',
+    '#options' => $field['options'],
     '#value'  => $field['placeholder'],
-    '#options' =>  array('return_value1' => t('Display Value 1'), 'return_value2' => t('Display Value 2')),
     '#attributes' => array(
       'data-id' => $field['id'],
       'class' => array('gcaba_drupal_form_render_field_select'),
@@ -30,7 +30,6 @@ function gcaba_drupal_form_render_field_select($field,$form) {
       'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
     ),
   );
-
   return $form;
 }
 
@@ -55,6 +54,7 @@ function gcaba_drupal_form_render_field_radio($field,$form) {
     '#title' => $field['title'],
     '#type' => 'radio',
     '#value'  => $field['placeholder'],
+    '#options' => $field['options'],
     '#attributes' => array(
       'data-id' => $field['id'],
       'class' => array('gcaba_drupal_form_render_field_radio'),
@@ -71,6 +71,7 @@ function gcaba_drupal_form_render_field_checkbox($field,$form) {
     '#title' => $field['title'],
     '#type' => 'checkbox',
     '#value'  => $field['placeholder'],
+    '#options' => $field['options'],
     '#attributes' => array(
       'data-id' => $field['id'],
       'class' => array('gcaba_drupal_form_render_field_checkbox'),

@@ -143,8 +143,6 @@ function gcaba_drupal_form_render_fields($form,$nodeData){
       case 'RECAPTCHA':
         $form = gcaba_drupal_form_render_field_recaptcha($v,$form);
         break;
-      //TODO los otros tipos
-      
     }
 
   }
@@ -168,12 +166,26 @@ function gcaba_drupal_form_get_fields($fields){
   $cleanFields = array();
 
   foreach ($fields as $key => $v) {
+    // Parse OPTIONS var
+    $result_final = array();
+    $result = explode( "\n", (count($v->field_field_gcaba_form_options)>0)?$v->field_field_gcaba_form_options[$language][0]["value"]:'' );
+    foreach ($result as $key => $value) {
+      $tmp = explode("|", $value);
+      $result_final[$tmp[0]] = $tmp[1];
+    }
+    // End parse
+
     $f = array(
-      'id' => $v->nid,
-      'title' => $v->title,
-      'type' => $v->field_gcaba_form_field_type[$language][0]["value"],
-      'placeholder' => (count($v->field_gcaba_form_placeholder)>0)?$v->field_gcaba_form_placeholder[$language][0]["value"]:''
-      ///TODO los demás campos...
+      'id'              => $v->nid,
+      'title'           => $v->title,
+      'type'            => $v->field_gcaba_form_field_type[$language][0]["value"],
+      'options'         => $result_final,
+      'validators'      => (count($v->field_gcaba_form_validators)>0)?$v->field_gcaba_form_validators[$language][0]["value"]:'',
+      'placeholder'     => (count($v->field_gcaba_form_placeholder)>0)?$v->field_gcaba_form_placeholder[$language][0]["value"]:'',
+      'label'           => (count($v->field_gcaba_form_label)>0)?$v->field_gcaba_form_label[$language][0]["value"]:'',
+      'help'            => (count($v->field_gcaba_form_help)>0)?$v->field_gcaba_form_help[$language][0]["value"]:'',
+      'initial_value'   => (count($v->field_gcaba_form_initial_value)>0)?$v->field_gcaba_form_initial_value[$language][0]["value"]:'',
+      'order'           => (count($v->field_field_gcaba_form_order)>0)?$v->field_field_gcaba_form_order[$language][0]["value"]:'',
     );
 
     $cleanFields[] = $f;
