@@ -21,12 +21,9 @@ function gcaba_drupal_form_render_field_select($field, $form) {
     '#title' => $field['title'],
     '#type' => 'select',
     '#options' => $field['options'],
-    '#value'  => $field['placeholder'],
     '#attributes' => array(
       'data-id' => $field['id'],
-      'class' => array('gcaba_drupal_form_render_field_select'),
-      'onfocus' => array('if(this.value == "'.$field['placeholder'].'") { this.value = ""; }'),
-      'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
+      'class' => array('gcaba_drupal_form_render_field_select')
     ),
   );
   return $form;
@@ -56,9 +53,7 @@ function gcaba_drupal_form_render_field_radio($field,$form) {
     '#options' => $field['options'],
     '#attributes' => array(
       'data-id' => $field['id'],
-      'class' => array('gcaba_drupal_form_render_field_radio'),
-      'onfocus' => array('if(this.value == "'.$field['placeholder'].'") { this.value = ""; }'),
-      'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
+      'class' => array('gcaba_drupal_form_render_field_radio')
     ),
   );
 
@@ -68,14 +63,11 @@ function gcaba_drupal_form_render_field_radio($field,$form) {
 function gcaba_drupal_form_render_field_checkbox($field,$form) {
   $form['gcaba_drupal_form_render_field_checkbox'.$field['id'] ] = array(
     '#title' => $field['title'],
-    '#type' => 'checkbox',
-    '#value'  => $field['placeholder'],
+    '#type' => 'checkboxes',
     '#options' => $field['options'],
     '#attributes' => array(
       'data-id' => $field['id'],
-      'class' => array('gcaba_drupal_form_render_field_checkbox'),
-      'onfocus' => array('if(this.value == "'.$field['placeholder'].'") { this.value = ""; }'),
-      'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
+      'class' => array('gcaba_drupal_form_render_field_checkbox')
     ),
   );
 
