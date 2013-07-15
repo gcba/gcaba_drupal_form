@@ -17,7 +17,6 @@ function gcaba_drupal_form_render_field_text($field, $form) {
 }
 
 function gcaba_drupal_form_render_field_select($field, $form) {
-  // TODO: Se muestra pero no muestra <options>
   $form['gcaba_drupal_form_render_field_select_'.$field['id'] ] = array(
     '#title' => $field['title'],
     '#type' => 'select',
@@ -52,7 +51,7 @@ function gcaba_drupal_form_render_field_textarea($field,$form) {
 function gcaba_drupal_form_render_field_radio($field,$form) {
   $form['gcaba_drupal_form_render_field_radio'.$field['id'] ] = array(
     '#title' => $field['title'],
-    '#type' => 'radio',
+    '#type' => 'radios',
     '#value'  => $field['placeholder'],
     '#options' => $field['options'],
     '#attributes' => array(
