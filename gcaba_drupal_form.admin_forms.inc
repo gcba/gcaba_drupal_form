@@ -98,6 +98,16 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
 		'#title' => t("Title"),
 	);
 
+	$form['fields']['field_fields'] = array(
+		'#type' => 'textfield',
+        '#title' => t('Fields'),
+        '#size' => 30,
+        '#maxlength' => 60,
+        '#autocomplete_path' => 'fields/autocomplete',
+        '#description' => t('Form fields'), 
+        '#default' => "",
+    );	
+
 	// Success text field
 	$form['fields']['gcaba_form_success_text'] = array(
 		'#type' => 'textfield',
@@ -106,16 +116,23 @@ function gcaba_drupal_form_admin_forms_add($form, &$form_state){
 		'#title' => "Success text",
 	);
 
-   
-	$form['fields']['field_fields'] = array(
-		'#type' => 'textfield',
-        '#title' => t('Field'),
-        '#size' => 30,
-        '#maxlength' => 60,
-        '#autocomplete_path' => 'fields/autocomplete',
-        '#description' => t('Field type'), 
-        '#default' => "",
-    );	
+	// TODO: Validate list of emails
+	$form['fields']['toemails'] = array(
+	    '#type' => 'textfield',
+	    '#title' => t('Emails'),
+	    '#required' => FALSE,
+	    '#default_value' => "",
+	    '#description' => "List all email receivers separated by a white space.",
+	);
+
+	// TODO: Validate API existance
+	$form['fields']['toapi'] = array(
+	    '#type' => 'textfield',
+	    '#title' => t('URL API List'),
+	    '#required' => FALSE,
+	    '#default_value' => "",
+	    '#description' => "API list URL where save results.",
+	);
     
     $form['fields']['add'] = array(
     	'#type' => 'button', 
