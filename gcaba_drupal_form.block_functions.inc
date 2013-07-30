@@ -86,37 +86,32 @@ function gcaba_drupal_form_render_form_validate($form,&$form_state) {
 }
 
 function gcaba_drupal_form_render_form_submit($form, &$form_state) {
-  $language = LANGUAGE_NONE; // #duda
-  $prefix = 'gcaba_drupal_form_render_field_';
+  $language   = LANGUAGE_NONE; // #duda
+  $prefix     = 'gcaba_drupal_form_render_field_';
+  $valores    = array();
 
-  $form_node = node_load($form['#attributes']['data-id']);
-
+  $form_node  = node_load($form['#attributes']['data-id']);
+  $tomail     = $form_node->field_gcaba_form_toemails[$language][0]['safe_value'] == '' ? FALSE : TRUE;
+  $toapi      = $form_node->field_gcaba_form_urlapi[$language][0]['safe_value'] == '' ? FALSE : TRUE;
+  
   foreach ($form_state['input'] as $key => $value) {
-
     if (!strncmp($key, $prefix, strlen($prefix))){
-      $fieldId = $form[$key]['#attributes']['data-id'];
-
-      //TODO hacer que grabe la data en algún lado
-
-      /*$node = new stdClass();
-      $node->type = 'gcaba_form_form_data';
-      node_object_prepare($node);
-
-      $node->title    = 'Node Created Programmatically on ' . date('c');
-      $node->language = LANGUAGE_NONE;
-      $path = 'content/programmatically_created_node_' . date('YmdHis');
-      $node->path = array('alias' => $path);
-      $node->body[$node->language][0]['value']   = 'text';
-      $node->body[$node->language][0]['summary'] = text_summary('summary');
-      $node->body[$node->language][0]['format']  = 'filtered_html';
-
-      $node->gcaba_form_form_id = $formId;
-      $node->gcaba_form_field_id = $fieldId;
-      $node->gcaba_form_data = $value;
-
-      node_save($node);*/
+      $field_node = node_load($form[$key]['#attributes']['data-id']);
+      array_push($valores, array($field_node->title, $value));
     }
 
+  }
+
+  dd($valores);
+
+  // Send mail
+  if($tomail){
+    dd("Sale por mail");
+  }
+
+  // Save it to API List
+  if($toapi){
+    dd("Sale por API");
   }
 
   if($form_node->field_gcaba_form_success_text[$language][0]['safe_value'] != ''){
