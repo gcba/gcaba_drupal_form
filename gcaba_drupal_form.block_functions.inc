@@ -86,8 +86,10 @@ function gcaba_drupal_form_render_form_validate($form,&$form_state) {
 }
 
 function gcaba_drupal_form_render_form_submit($form, &$form_state) {
-  $formId = $form['#attributes']['data-id'];
+  $language = LANGUAGE_NONE; // #duda
   $prefix = 'gcaba_drupal_form_render_field_';
+
+  $form_node = node_load($form['#attributes']['data-id']);
 
   foreach ($form_state['input'] as $key => $value) {
 
@@ -117,7 +119,11 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 
   }
 
-  return array("#markup" => 'gracias!!' );
+  if($form_node->field_gcaba_form_success_text[$language][0]['safe_value'] != ''){
+    return array('#markup' => $form_node->field_gcaba_form_success_text[$language][0]['safe_value']);
+  }else{
+    return array("#markup" => 'El formulario fue procesado correctamente.' );
+  }
 }
 
 function gcaba_drupal_form_render_fields($form,$nodeData){
