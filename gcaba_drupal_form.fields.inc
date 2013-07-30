@@ -1023,7 +1023,7 @@ Ej:
     ),
     'entity_type' => 'node',
     'field_name' => 'field_gcaba_form_fields',
-    'label' => 'gcaba_form_fields',
+    'label' => 'Form fields',
     'required' => 1,
     'settings' => array(
       'behaviors' => array(
@@ -1069,7 +1069,7 @@ Ej:
     ),
     'entity_type' => 'node',
     'field_name' => 'field_gcaba_form_success_text',
-    'label' => 'gcaba_form_success_text',
+    'label' => 'Success text',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
