@@ -2,14 +2,6 @@
 
 function gcaba_drupal_form_get_content_types() {
   $items = array(
-    'gcaba_form_data' => array(
-      'name' => t('GCABA Data'),
-      'base' => 'node_content',
-      'description' => '',
-      'has_title' => '1',
-      'title_label' => t('Title'),
-      'help' => '',
-    ),
     'gcaba_form_field' => array(
       'name' => t('GCABA Field'),
       'base' => 'node_content',
@@ -346,13 +338,13 @@ function gcaba_drupal_form_get_fields_base() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_gcaba_form_toemail'
-  $field_bases['field_gcaba_form_toemail'] = array(
+  // Exported field_base: 'field_gcaba_form_toemails'
+  $field_bases['field_gcaba_form_toemails'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
-    'field_name' => 'field_gcaba_form_toemail',
+    'field_name' => 'field_gcaba_form_toemails',
     'foreign keys' => array(
       'format' => array(
         'columns' => array(
@@ -890,8 +882,8 @@ Ej:
   );
 
   // Exported field_instance: 'node-gcaba_form_field-field_gcaba_form_toemails'
-  $field_instances['node-gcaba_form_field-field_gcaba_form_toemails'] = array(
-    'bundle' => 'gcaba_form_field',
+  $field_instances['node-gcaba_form_form-field_gcaba_form_toemails'] = array(
+    'bundle' => 'gcaba_form_form',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
@@ -930,8 +922,8 @@ Ej:
   );
 
   // Exported field_instance: 'node-gcaba_form_field-field_gcaba_form_urlapi'
-  $field_instances['node-gcaba_form_field-field_gcaba_form_urlapi'] = array(
-    'bundle' => 'gcaba_form_field',
+  $field_instances['node-gcaba_form_form-field_gcaba_form_urlapi'] = array(
+    'bundle' => 'gcaba_form_form',
     'default_value' => NULL,
     'deleted' => 0,
     'description' => '',
