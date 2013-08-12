@@ -74,35 +74,69 @@ function gcaba_drupal_form_render($form, &$form_state,$nodeId) {
       '#markup' => ''
   );
 
-  return $form;//$formData->title;
-}
-
-/**
- * Implementa hook_FORM_ID_validate().
- * Valida la información que llega al momento del submit del formulario inicial.
- */
-function gcaba_drupal_form_render_form_validate($form,&$form_state) {
-  //TODO validate
+  return $form;
 }
 
 function gcaba_drupal_form_render_form_submit($form, &$form_state) {
   $language   = LANGUAGE_NONE; // #duda
   $prefix     = 'gcaba_drupal_form_render_field_';
   $valores    = array();
+  $errors     = array();
 
   $form_node  = node_load($form['#attributes']['data-id']);
   $tomail     = $form_node->field_gcaba_form_toemails[$language][0]['safe_value'] == '' ? FALSE : TRUE;
   $toapi      = $form_node->field_gcaba_form_urlapi[$language][0]['safe_value'] == '' ? FALSE : TRUE;
+
+  $wrapperId = 'gcaba_drupal_form_result_' . $form['#attributes']['data-id'] ;
   
   foreach ($form_state['input'] as $key => $value) {
     if (!strncmp($key, $prefix, strlen($prefix))){
       $field_node = node_load($form[$key]['#attributes']['data-id']);
+
+      foreach ($field_node->field_gcaba_form_validators[$language] as $key1 => $value1) {
+        switch ($value1["value"]) {
+          case 'REQUERIDO':
+            if (empty($value)){
+              array_push($errors, t("Field <b>").$field_node->title. t("</b> is required."));
+            }
+            break;
+          case 'URL':
+            if (!valid_url($value)){
+              array_push($errors, t("Field <b>").$field_node->title. t("</b> is not an URL."));
+            }
+            break;
+          case 'EMAIL':
+            if (!valid_email_address($value)){
+              array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a valid email address."));
+            }
+            break;
+          case 'NUMERIC':
+            if (!is_numeric($value)){
+              array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a number."));
+            }
+            break;
+          case 'NON-NUMERIC':
+            if (is_numeric($value)){
+              array_push($errors, t("Field <b>").$field_node->title. t("</b> must not be a number."));
+            }
+            break;
+        }
+      }
       array_push($valores, array($field_node->title, $value));
     }
-
   }
 
-  dd($valores);
+  $proceso = TRUE;
+  if(count($errors) > 0){
+    $html = "<ul class='error'>";
+    foreach ($errors as $key => $value) {
+      $html .= "<li>".$value."</li>";
+    }
+    $html .= "</ul>";
+
+    $form[$wrapperId]['#markup'] = $html;
+    $proceso = FALSE;
+  }
 
   // Send mail
   if($tomail){
@@ -114,11 +148,15 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
     dd("Sale por API");
   }
 
-  if($form_node->field_gcaba_form_success_text[$language][0]['safe_value'] != ''){
-    return array('#markup' => $form_node->field_gcaba_form_success_text[$language][0]['safe_value']);
-  }else{
-    return array("#markup" => 'El formulario fue procesado correctamente.' );
+  if($proceso == TRUE){
+    if($form_node->field_gcaba_form_success_text[$language][0]['safe_value'] != ''){
+      $form[$wrapperId]['#markup'] = $form_node->field_gcaba_form_success_text[$language][0]['safe_value'] ;
+    }else{
+      $form[$wrapperId]['#markup'] = t('El formulario fue procesado correctamente.');
+    }
   }
+  
+  return $form[$wrapperId];
 }
 
 function gcaba_drupal_form_render_fields($form,$nodeData){
