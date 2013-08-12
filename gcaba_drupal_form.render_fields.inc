@@ -4,12 +4,12 @@ function gcaba_drupal_form_render_field_text($field, $form) {
   $form['gcaba_drupal_form_render_field_text_'.$field['id'] ] = array(
     '#title' => $field['title'],
     '#type' => 'textfield',
-    '#value'  => $field['placeholder'],
+    '#value'  => "",
     '#attributes' => array(
       'data-id' => $field['id'],
-      'class' => array('gcaba_drupal_form_render_field_text'),
-      'onfocus' => array('if(this.value == "'.$field['placeholder'].'") { this.value = ""; }'),
-      'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
+      'class' => array('gcaba_drupal_form_render_field_text')
+      //'onfocus' => array('if(this.value == "'.$field['placeholder'].'") { this.value = ""; }'),
+      //'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
     ),
   );
 
@@ -33,7 +33,7 @@ function gcaba_drupal_form_render_field_textarea($field,$form) {
   $form['gcaba_drupal_form_render_field_textarea'.$field['id'] ] = array(
     '#title' => $field['title'],
     '#type' => 'textarea',
-    '#value'  => $field['placeholder'],
+    '#value'  => "",
     '#attributes' => array(
       'data-id' => $field['id'],
       'class' => array('gcaba_drupal_form_render_field_textarea'),
