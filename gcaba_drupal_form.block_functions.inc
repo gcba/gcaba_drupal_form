@@ -1,6 +1,10 @@
 <?php
 require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.render_fields.inc';
 
+function trim_value(&$value){ 
+    $value = trim($value); 
+}
+
 /**
  * Implementa hook_info().
  */
@@ -139,13 +143,33 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
   }
 
   // Send mail
-  if($tomail){
-    dd("Sale por mail");
+  if($tomail && $proceso){
+    $emails = explode(",", trim( $form_node->field_gcaba_form_toemails[$language][0]['safe_value'] ) );
+    array_walk($emails, 'trim_value');
+
+    $body = "";
+    foreach ($valores as $key5 => $value5) {
+      $body .= $value5[0]. ": ".$value5[1]."<br>";
+    }
+
+    foreach ($emails as $key => $email) {
+      // TODO Valido correo
+      $from = 'noreply@buenosaires.gob.ar';
+
+      $params = array(
+        'body' => $body,
+        'subject' => $form_node->title,
+      );
+
+      if (!drupal_mail('gcaba_drupal_form', 'gcaba_drupal_form_email', $email, language_default(), $params, $from, TRUE)){
+        $proceso == FALSE;
+      }
+    }
   }
 
   // Save it to API List
-  if($toapi){
-    dd("Sale por API");
+  if($toapi && $proceso){
+    dd("TODO: Sale por API");
   }
 
   if($proceso == TRUE){
@@ -185,7 +209,6 @@ function gcaba_drupal_form_render_fields($form,$nodeData){
     }
 
   }
-
   return $form;
 
 }
@@ -193,8 +216,6 @@ function gcaba_drupal_form_render_fields($form,$nodeData){
 function gcaba_drupal_form_get_fields($fields){
   $ids = array();
 
-  //var_dump($fields["und"]);
-  //echo '<br/>';
   $language = LANGUAGE_NONE;
   foreach ($fields[$language] as $key => $value) {
     $ids[]=(int)$value["target_id"];
@@ -232,41 +253,5 @@ function gcaba_drupal_form_get_fields($fields){
 
   return $cleanFields;
 }
-
-//Ejemplo de uso - gcaba_drupal_form_insert_block(44,'Bloque de Test');
-
-/*function gcaba_drupal_form_insert_block($id,$title) {
-  //graba pero tiene algún problema porque no llama al hook block_view de arriba
-
-  $identifier = 'GCABAForm-'.$id.'-'.$title;
-
-  $delta = db_insert('block_custom')->fields(array(
-    'info' => $identifier,
-    'body' => 'Formulario creado con GCABA Drupal Form: ID:'.$id.' - NOMBRE:'.$title,
-    'format' => 'filtered_html',
-  ))->execute();
-
-  $query = db_insert('block')->fields(array('visibility', 'pages', 'custom', 'title', 'module', 'theme', 'status', 'weight', 'delta', 'cache'));
-    foreach (list_themes() as $key => $theme) {
-      if ($theme->status) {
-        $query->values(array(
-          'visibility' => 1,
-          'pages' => "2",
-          'custom' => 1,
-          'title' => $identifier,
-          'module' => 'gcaba_drupal_form',
-          'theme' => '',
-          'status' => 1,
-          'weight' => 1,
-          'delta' => $identifier,
-          'cache' => DRUPAL_NO_CACHE,
-        ));
-      }
-    }
-    $query->execute();
-
-}
-*/
-
 
 ?>
