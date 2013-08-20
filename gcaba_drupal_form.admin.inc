@@ -23,45 +23,48 @@ function gcaba_drupal_form_menu(){
 	);
 
 	$items['admin/config/gcaba_drupal_form/administer'] = array(
-    'access arguments' => array('administer site configuration'),
-    'description' => t('Global forms configuration'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('gcaba_drupal_form_admin'),
-    'title' => t('Forms configuration'),
-    'weight' => 10,
-  );
+        'access arguments' => array('administer site configuration'),
+        'description' => t('Global forms configuration'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('gcaba_drupal_form_admin'),
+        'title' => t('Forms configuration'),
+        'weight' => 10,
+    );
+    
     $items['admin/config/gcaba_drupal_form/fields'] = array(
-    'access arguments' => array('administer site configuration'),
-    'description' => t('Add, modify and delete fields'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('gcaba_drupal_form_admin_fields'),
-    'title' => t('Manage fields'),
-    'weight' => 10,
-  );
+        'access arguments' => array('administer site configuration'),
+        'description' => t('Add, modify and delete fields'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('gcaba_drupal_form_admin_fields'),
+        'title' => t('Manage fields'),
+        'weight' => 10,
+    );
+    
     $items['admin/config/gcaba_drupal_form/forms'] = array(
-    'access arguments' => array('administer site configuration'),
-    'description' => t('Add, modify and delete forms'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('gcaba_drupal_form_admin_forms'),
-    'title' => t('Manage forms'),
-    'weight' => 10,
-  );
+        'access arguments' => array('administer site configuration'),
+        'description' => t('Add, modify and delete forms'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('gcaba_drupal_form_admin_forms'),
+        'title' => t('Manage forms'),
+        'weight' => 10,
+    );
 
     $items['admin/config/gcaba_drupal_form/forms/add'] = array(
-    'access arguments' => array('administer site configuration'),
-    'description' => t('Add form'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('gcaba_drupal_form_admin_forms_add'),
-    'title' => t('Add form'),
-    'weight' => 10,
-  );
+        'access arguments' => array('administer site configuration'),
+        'description' => t('Add form'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('gcaba_drupal_form_admin_forms_add'),
+        'title' => t('Add form'),
+        'weight' => 10,
+    );
 
 	$items['admin/gcaba_drupal_form/drupal_gcaba_do'] = array(
-    'access arguments' => array('administer site configuration'),
-    'page callback' => 'gcaba_',
-    'page arguments' => array(),
-  );
-return $items;
+        'access arguments' => array('administer site configuration'),
+        'page callback' => 'gcaba_',
+        'page arguments' => array(),
+    );
+    
+    return $items;
 }
 
 /**
@@ -76,8 +79,3 @@ function gcaba_drupal_form_admin(){
 
     return $form;
 }
-
-/**
- * Implementa hook_admin().
- */
-
