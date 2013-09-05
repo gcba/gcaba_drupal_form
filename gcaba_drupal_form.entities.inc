@@ -96,4 +96,16 @@ function gcaba_drupal_form_entity_info(){
 	return $return;
 }
 
+function gcaba_forms_forms_uri($gcaba_forms_forms){
+    return array(
+        'path'  => 'gcaba_forms_forms/' . $gcaba_forms_forms->aid,
+    );
+}
+
+function gcaba_forms_form_fields_uri($gcaba_forms_form_fields){
+    return array(
+        'path'  => 'gcaba_forms_form_fields/' . $gcaba_forms_form_fields
+    );
+}
+
 ?>
