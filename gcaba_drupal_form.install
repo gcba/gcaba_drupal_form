@@ -1,5 +1,8 @@
+<?php
+
 function gcaba_drupal_form_schema(){
-	$schema['gcaba_forms'] = array(
+
+	$schema['gcaba_forms_forms'] = array(
 	    'description' => 'The base table for GCABA Forms.',
 	    'fields' => array(
 	      'nid' => array(
@@ -65,5 +68,164 @@ function gcaba_drupal_form_schema(){
 	    'primary key' => array('nid'),
 	  );
 
+	$schema['gcaba_forms_forms_revision'] = array(
+		'description'	=> 'Stores information about each saved version of an {gcaba_forms_forms}.',
+		
+		'fields'	=> array(
+			'aid'	  => array(
+				'description' 	=> 'The {gcaba_form} of this version belongs to.',
+				'type'			=> 'int',
+				'unsigned'		=> TRUE,
+				'not null'		=> TRUE,
+				'default'		=> 0,
+			),
+			'vid'	  => array(
+				'description' 	=> 'The primary identifier for this version.',
+				'type'			=> 'serial',
+				'unsigned'		=> TRUE,
+				'not null'		=> TRUE,
+			),
+			'title'	  => array(
+				'description' 	=> 'The title of this version.',
+				'type'			=> 'varchar',
+				'length'		=> 255,
+				'not null'		=> TRUE,
+				'default'		=> '',
+			),
+			'created' => array(
+				'description' 	=> 'The Unix timestamp when the gcaba form was created.',
+				'type'			=> 'int',
+				'not null'		=> TRUE,
+				'default'		=> 0,
+			),
+		),
+		
+		'indexes' => array('aid' => array('aid')),
+		
+		'primary key'	=> array('vid'),
+
+		'foreign key'	=> array(
+			'gcaba_forms_forms' => array(
+				'table'	=> 'gcaba_forms_forms',
+				'columns' => array(
+					'aid'	=> 'aid',
+				),
+			),
+		),
+	);
+
+	$schema['gcaba_forms_form_fields'] = array(
+	    'description' => 'The base table for GCABA Forms.',
+	    'fields' => array(
+	      'nid' => array(
+	        'description' => 'The primary identifier for a node.',
+	        'type' => 'serial',
+	        'unsigned' => TRUE,
+	        'not null' => TRUE),
+	      'vid' => array(
+	        'description' => 'The current {node_revisions}.vid version identifier.',
+	        'type' => 'int',
+	        'unsigned' => TRUE,
+	        'not null' => TRUE,
+	        'default' => 0),
+	      'type' => array(
+	        'description' => 'The {node_type} of this node.',
+	        'type' => 'varchar',
+	        'length' => 32,
+	        'not null' => TRUE,
+	        'default' => ''),
+	      'title' => array(
+	        'description' => 'The title, always treated a non-markup plain text.',
+	        'type' => 'varchar',
+	        'length' => 255,
+	        'not null' => TRUE,
+	        'default' => ''),
+	      'success_text' => array(
+	        'description' => 'The default success message, always treated a non-markup plain text.',
+	        'type' => 'varchar',
+	        'length' => 500,
+	        'not null' => TRUE,
+	        'default' => ''),
+	      'emails' => array(
+	        'description' => 'A list of emails separated by a colon, always treated a non-markup plain text.',
+	        'type' => 'varchar',
+	        'length' => 500,
+	        'not null' => TRUE,
+	        'default' => ''),
+	      'url' => array(
+	        'description' => 'The URL for REST API, always treated a non-markup plain text.',
+	        'type' => 'varchar',
+	        'length' => 500,
+	        'not null' => TRUE,
+	        'default' => ''),
+	      'created' => array(
+	        'description' => 'The Unix timestamp when the node was created.',
+	        'type' => 'int',
+	        'not null' => TRUE,
+	        'default' => 0),
+	      'changed' => array(
+	        'description' => 'The Unix timestamp when the node was most recently saved.',
+	        'type' => 'int',
+	        'not null' => TRUE,
+	        'default' => 0),
+	      ),
+	    'indexes' => array(
+	      'node_changed'        => array('changed'),
+	      'node_created'        => array('created'),
+	      ),
+	    'unique keys' => array(
+	      'nid_vid' => array('nid', 'vid'),
+	      'vid'     => array('vid')
+	      ),
+	    'primary key' => array('nid'),
+	  );
+
+	$schema['gcaba_forms_form_fields_revision'] = array(
+		'description'	=> 'Stores information about each saved version of an {gcaba_forms_form_fields}.',
+		
+		'fields'	=> array(
+			'aid'	  => array(
+				'description' 	=> 'The {gcaba_form} of this version belongs to.',
+				'type'			=> 'int',
+				'unsigned'		=> TRUE,
+				'not null'		=> TRUE,
+				'default'		=> 0,
+			),
+			'vid'	  => array(
+				'description' 	=> 'The primary identifier for this version.',
+				'type'			=> 'serial',
+				'unsigned'		=> TRUE,
+				'not null'		=> TRUE,
+			),
+			'title'	  => array(
+				'description' 	=> 'The title of this version.',
+				'type'			=> 'varchar',
+				'length'		=> 255,
+				'not null'		=> TRUE,
+				'default'		=> '',
+			),
+			'created' => array(
+				'description' 	=> 'The Unix timestamp when the gcaba form was created.',
+				'type'			=> 'int',
+				'not null'		=> TRUE,
+				'default'		=> 0,
+			),
+		),
+		
+		'indexes' => array('aid' => array('aid')),
+		
+		'primary key'	=> array('vid'),
+
+		'foreign key'	=> array(
+			'gcaba_forms_form_fields' => array(
+				'table'	=> 'gcaba_forms_form_fields',
+				'columns' => array(
+					'aid'	=> 'aid',
+				),
+			),
+		),
+	);
+
 	return $schema;
 }
+?>
