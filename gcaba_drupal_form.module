@@ -1,35 +1,7 @@
 <?php
 
-require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.schema.inc';
+require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.entities.inc';
 require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.admin.inc';
-require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.admin_forms.inc';
-require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.block_functions.inc';
-
-/**
- * Implementa hook_help().
- */
-function gcaba_drupal_form_help($path, $arg) {
-  if ($path == 'admin/help#gcaba_drupal_form') {
-    return t('GCABA Drupal Forms.');
-  }
-}
-
-/**
- * Implementa hook_enable().
- */
-function gcaba_drupal_form_enable() {
-	gcaba_drupal_form_create_schema();
-}
-
-/**
- * Implementa hook_disable().
- */
-function gcaba_drupal_form_disable() {
-
-	gcaba_drupal_form_remove_schema();
-	//TODO eliminar data
-	//TODO eliminar bloques
-}
-
-
+//require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.admin_forms.inc';
+//require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.block_functions.inc';
 ?>
