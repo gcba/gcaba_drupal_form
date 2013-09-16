@@ -1,231 +1,108 @@
 <?php
+/**
+ * @file
+ * Install for a basic entities.
+ */
 
-function gcaba_drupal_form_schema(){
+/**
+ * Implements hook_schema().
+ */
+function gcaba_drupal_form_schema() {
+  $schema = array();
 
-	$schema['gcaba_forms_forms'] = array(
-	    'description' => 'The base table for GCABA Forms.',
-	    'fields' => array(
-	      'nid' => array(
-	        'description' => 'The primary identifier for a node.',
-	        'type' => 'serial',
-	        'unsigned' => TRUE,
-	        'not null' => TRUE),
-	      'vid' => array(
-	        'description' => 'The current {node_revisions}.vid version identifier.',
-	        'type' => 'int',
-	        'unsigned' => TRUE,
-	        'not null' => TRUE,
-	        'default' => 0),
-	      'type' => array(
-	        'description' => 'The {node_type} of this node.',
-	        'type' => 'varchar',
-	        'length' => 32,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'title' => array(
-	        'description' => 'The title, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 255,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'success_text' => array(
-	        'description' => 'The default success message, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 500,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'emails' => array(
-	        'description' => 'A list of emails separated by a colon, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 500,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'url' => array(
-	        'description' => 'The URL for REST API, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 500,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'created' => array(
-	        'description' => 'The Unix timestamp when the node was created.',
-	        'type' => 'int',
-	        'not null' => TRUE,
-	        'default' => 0),
-	      'changed' => array(
-	        'description' => 'The Unix timestamp when the node was most recently saved.',
-	        'type' => 'int',
-	        'not null' => TRUE,
-	        'default' => 0),
-	      ),
-	    'indexes' => array(
-	      'node_changed'        => array('changed'),
-	      'node_created'        => array('created'),
-	      ),
-	    'unique keys' => array(
-	      'nid_vid' => array('nid', 'vid'),
-	      'vid'     => array('vid')
-	      ),
-	    'primary key' => array('nid'),
-	  );
+  // The name of the table can be any name we choose. However, namespacing the
+  // table with the module name is best practice.
+  $schema['gcaba_forms_forms'] = array(
+    'description' => 'The base table for our basic entity.',
+      'fields' => array(
+        'basic_id' => array(
+          'description' => 'Primary key of the basic entity.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        // If we allow multiple bundles, then the schema must handle that;
+        // We'll put it in the 'bundle_type' field to avoid confusion with the
+        // entity type.
+        'bundle_type' => array(
+          'description' => 'The bundle type',
+          'type' => 'text',
+          'size' => 'medium',
+          'not null' => TRUE
+        ),
+        // Additional properties are just things that are common to all
+        // entities and don't require field storage.
+        'title' => array(
+          'description' => 'Form title',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
 
-	$schema['gcaba_forms_forms_revision'] = array(
-		'description'	=> 'Stores information about each saved version of an {gcaba_forms_forms}.',
-		
-		'fields'	=> array(
-			'aid'	  => array(
-				'description' 	=> 'The {gcaba_form} of this version belongs to.',
-				'type'			=> 'int',
-				'unsigned'		=> TRUE,
-				'not null'		=> TRUE,
-				'default'		=> 0,
-			),
-			'vid'	  => array(
-				'description' 	=> 'The primary identifier for this version.',
-				'type'			=> 'serial',
-				'unsigned'		=> TRUE,
-				'not null'		=> TRUE,
-			),
-			'title'	  => array(
-				'description' 	=> 'The title of this version.',
-				'type'			=> 'varchar',
-				'length'		=> 255,
-				'not null'		=> TRUE,
-				'default'		=> '',
-			),
-			'created' => array(
-				'description' 	=> 'The Unix timestamp when the gcaba form was created.',
-				'type'			=> 'int',
-				'not null'		=> TRUE,
-				'default'		=> 0,
-			),
-		),
-		
-		'indexes' => array('aid' => array('aid')),
-		
-		'primary key'	=> array('vid'),
+        'created' => array(
+          'description' => 'The Unix timestamp of the entity creation time.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+      ),
+    'primary key' => array('basic_id'),
+  );
 
-		'foreign key'	=> array(
-			'gcaba_forms_forms' => array(
-				'table'	=> 'gcaba_forms_forms',
-				'columns' => array(
-					'aid'	=> 'aid',
-				),
-			),
-		),
-	);
+  // The name of the table can be any name we choose. However, namespacing the
+  // table with the module name is best practice.
+  $schema['gcaba_forms_fields'] = array(
+    'description' => 'The base table for our basic entity.',
+      'fields' => array(
+        'basic_id' => array(
+          'description' => 'Primary key of the basic entity.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        // If we allow multiple bundles, then the schema must handle that;
+        // We'll put it in the 'bundle_type' field to avoid confusion with the
+        // entity type.
+        'bundle_type' => array(
+          'description' => 'The bundle type',
+          'type' => 'text',
+          'size' => 'medium',
+          'not null' => TRUE
+        ),
+        // Additional properties are just things that are common to all
+        // entities and don't require field storage.
+        'title' => array(
+          'description' => 'Field title',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
 
-	$schema['gcaba_forms_form_fields'] = array(
-	    'description' => 'The base table for GCABA Forms.',
-	    'fields' => array(
-	      'nid' => array(
-	        'description' => 'The primary identifier for a node.',
-	        'type' => 'serial',
-	        'unsigned' => TRUE,
-	        'not null' => TRUE),
-	      'vid' => array(
-	        'description' => 'The current {node_revisions}.vid version identifier.',
-	        'type' => 'int',
-	        'unsigned' => TRUE,
-	        'not null' => TRUE,
-	        'default' => 0),
-	      'type' => array(
-	        'description' => 'The {node_type} of this node.',
-	        'type' => 'varchar',
-	        'length' => 32,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'title' => array(
-	        'description' => 'The title, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 255,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'success_text' => array(
-	        'description' => 'The default success message, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 500,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'emails' => array(
-	        'description' => 'A list of emails separated by a colon, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 500,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'url' => array(
-	        'description' => 'The URL for REST API, always treated a non-markup plain text.',
-	        'type' => 'varchar',
-	        'length' => 500,
-	        'not null' => TRUE,
-	        'default' => ''),
-	      'created' => array(
-	        'description' => 'The Unix timestamp when the node was created.',
-	        'type' => 'int',
-	        'not null' => TRUE,
-	        'default' => 0),
-	      'changed' => array(
-	        'description' => 'The Unix timestamp when the node was most recently saved.',
-	        'type' => 'int',
-	        'not null' => TRUE,
-	        'default' => 0),
-	      ),
-	    'indexes' => array(
-	      'node_changed'        => array('changed'),
-	      'node_created'        => array('created'),
-	      ),
-	    'unique keys' => array(
-	      'nid_vid' => array('nid', 'vid'),
-	      'vid'     => array('vid')
-	      ),
-	    'primary key' => array('nid'),
-	  );
+        'created' => array(
+          'description' => 'The Unix timestamp of the entity creation time.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+      ),
+    'primary key' => array('basic_id'),
+  );
 
-	$schema['gcaba_forms_form_fields_revision'] = array(
-		'description'	=> 'Stores information about each saved version of an {gcaba_forms_form_fields}.',
-		
-		'fields'	=> array(
-			'aid'	  => array(
-				'description' 	=> 'The {gcaba_form} of this version belongs to.',
-				'type'			=> 'int',
-				'unsigned'		=> TRUE,
-				'not null'		=> TRUE,
-				'default'		=> 0,
-			),
-			'vid'	  => array(
-				'description' 	=> 'The primary identifier for this version.',
-				'type'			=> 'serial',
-				'unsigned'		=> TRUE,
-				'not null'		=> TRUE,
-			),
-			'title'	  => array(
-				'description' 	=> 'The title of this version.',
-				'type'			=> 'varchar',
-				'length'		=> 255,
-				'not null'		=> TRUE,
-				'default'		=> '',
-			),
-			'created' => array(
-				'description' 	=> 'The Unix timestamp when the gcaba form was created.',
-				'type'			=> 'int',
-				'not null'		=> TRUE,
-				'default'		=> 0,
-			),
-		),
-		
-		'indexes' => array('aid' => array('aid')),
-		
-		'primary key'	=> array('vid'),
-
-		'foreign key'	=> array(
-			'gcaba_forms_form_fields' => array(
-				'table'	=> 'gcaba_forms_form_fields',
-				'columns' => array(
-					'aid'	=> 'aid',
-				),
-			),
-		),
-	);
-
-	return $schema;
+  return $schema;
 }
-?>
+
+
+/*
+ * Implements hook_uninstall().
+ *
+ * At uninstall time we'll notify field.module that the entity was deleted
+ * so that attached fields can be cleaned up.
+ *
+ * @ingroup entity_example
+ */
+function gcaba_drupal_form_uninstall() {
+  field_attach_delete_bundle('gcaba_forms_forms' , 'gcaba_forms_forms_bundle' );
+  field_attach_delete_bundle('gcaba_forms_fields' , 'gcaba_forms_fields_bundle' );
+}
