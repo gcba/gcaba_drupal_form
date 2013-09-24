@@ -2,6 +2,6 @@
 
 require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.entities.inc';
 require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.admin.inc';
-//require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.admin_forms.inc';
+require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.menu.inc';
 //require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.block_functions.inc';
 ?>
