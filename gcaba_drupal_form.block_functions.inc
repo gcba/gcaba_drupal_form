@@ -1,6 +1,4 @@
 <?php
-require_once drupal_get_path('module','gcaba_drupal_form').'/gcaba_drupal_form.render_fields.inc';
-
 function trim_value(&$value){ 
     $value = trim($value); 
 }
@@ -9,19 +7,13 @@ function trim_value(&$value){
  * Implementa hook_info().
  */
 function gcaba_drupal_form_block_info() {
-  //TODO buscar todos los creados por el módulo y agregarlos.
- 
-  $nids = db_select('node', 'n')
-    ->fields('n', array('nid'))
-    ->fields('n', array('title'))
-    ->condition('n.type', 'gcaba_form_form')
-    ->execute()
-    ->fetchAll();
+  $blocks = array();
+  $entities = gcaba_forms_forms_load_multiple();
 
-  foreach ($nids as $key => $form) {
-    $identifier = 'GCABAForm-'.$form->nid;
+  foreach ($entities as $key => $form) {
+    $identifier = 'GCABAForm-'.$form->basic_id;
     $blocks[$identifier] = array(
-      'info' => 'GCABA Drupal Form: '.$form->title, 
+      'info' => 'GCABA Form: '.$form->title, 
       'cache' => DRUPAL_NO_CACHE
     );
   }
@@ -36,27 +28,27 @@ function gcaba_drupal_form_block_view($delta = '') {
   $delta = explode('-', $delta);
   $block = array();
 
-  if($delta[0] && $delta[0]=='GCABAForm'){
+  if($delta[0] && $delta[0] == 'GCABAForm'){
     $block = array(
-      'content' => drupal_get_form('gcaba_drupal_form_render',$delta[1])
+      'content' => drupal_get_form('gcaba_drupal_form_render', $delta[1])
     );
   }
 
   return $block;
 }
 
-function gcaba_drupal_form_render($form, &$form_state,$nodeId) {
-  $nodeData = node_load($nodeId);
+function gcaba_drupal_form_render($form, &$form_state, $id) {
+  $entity = gcaba_forms_forms_load($id);
 
-  $form['#attributes']['id'] = 'gcaba_drupal_form_render_form_'.$nodeId;
+  $form['#attributes']['id'] = 'gcaba_drupal_form_render_form_'.$id;
 
-  $form['#attributes']['data-id'] = $nodeId;
+  $form['#attributes']['data-id'] = $id;
 
   $form['#attributes']['class'][] = 'gcaba-drupal-form-render-form';
 
-  $form = gcaba_drupal_form_render_fields($form,$nodeData);
+  $form = gcaba_drupal_form_render_fields($form, $entity);
 
-  $wrapperId = 'gcaba_drupal_form_result_'.$nodeId;
+  $wrapperId = 'gcaba_drupal_form_result_'.$id;
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -81,15 +73,80 @@ function gcaba_drupal_form_render($form, &$form_state,$nodeId) {
   return $form;
 }
 
+function gcaba_drupal_form_render_fields($form, $form_entity){
+  $fields = gcaba_drupal_form_get_fields(unserialize($form_entity->fields));
+
+  foreach ($fields as $v) {
+    switch ($v['type']) {
+      case 'TEXT':
+        $form = gcaba_drupal_form_render_field_text($v, $form);
+        break;
+      case 'SELECT':
+        $form = gcaba_drupal_form_render_field_select($v, $form);
+        break;
+      case 'TEXTAREA':
+        $form = gcaba_drupal_form_render_field_textarea($v, $form);
+        break;
+      case 'RADIO':
+        $form = gcaba_drupal_form_render_field_radio($v, $form);
+        break;
+      case 'CHECKBOX':
+        $form = gcaba_drupal_form_render_field_checkbox($v, $form);
+        break;
+      case 'RECAPTCHA':
+        $form = gcaba_drupal_form_render_field_recaptcha($v, $form);
+        break;
+    }
+
+  }
+  return $form;
+
+}
+
+function gcaba_drupal_form_get_fields($fields){
+  $fields = gcaba_forms_fields_load_multiple($fields);
+  $cleanFields = array();
+
+  foreach ($fields as $key => $v) {
+    // Parse OPTIONS var
+    $result_final = array();
+
+    if(!empty($v->options)){
+      $result = explode( "\n", $v->options);
+      foreach ($result as $key => $value) {
+        $tmp = explode("|", $value);
+        $result_final[$tmp[0]] = $tmp[1];
+      }
+      // End parse
+    }
+
+    // TODO: Ugli...
+    // TODO: No andan los validators
+    $f = array(
+      'id'              => $v->basic_id,
+      'title'           => $v->title,
+      'type'            => $v->type,
+      'options'         => $result_final,
+      'validators'      => $v->validators,
+      'placeholder'     => $v->placeholder,
+      'label'           => $v->label,
+      'help'            => $v->help,
+      'initial_value'   => $v->value,
+    );
+    $cleanFields[] = $f;
+  }
+
+  return $cleanFields;
+}
+
 function gcaba_drupal_form_render_form_submit($form, &$form_state) {
-  $language   = LANGUAGE_NONE; // #duda
   $prefix     = 'gcaba_drupal_form_render_field_';
   $valores    = array();
   $errors     = array();
+  $form_entity = gcaba_forms_forms_load($form['#attributes']['data-id']);
 
-  $form_node  = node_load($form['#attributes']['data-id']);
-  $tomail     = $form_node->field_gcaba_form_toemails[$language][0]['safe_value'] == '' ? FALSE : TRUE;
-  $toapi      = $form_node->field_gcaba_form_urlapi[$language][0]['safe_value'] == '' ? FALSE : TRUE;
+  $tomail     = $form_entity->emails  == '' ? FALSE : TRUE;
+  $toapi      = $form_entity->url     == '' ? FALSE : TRUE;
 
   $wrapperId = 'gcaba_drupal_form_result_' . $form['#attributes']['data-id'] ;
   
@@ -167,9 +224,24 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
     }
   }
 
+dd($valores);
   // Save it to API List
   if($toapi && $proceso){
-    dd("TODO: Sale por API");
+    $url = $form_node->field_gcaba_form_urlapi[$language][0]['safe_value'];
+    if(valid_url($url, TRUE)){
+      
+      $options = array(
+        'method' => 'POST',
+        'data' => json_encode($valores),
+        'headers' => array('Content-Type' => 'application/json'),
+      );
+
+      $result = drupal_http_request($url, $options);
+      dd($result);
+    }else{
+      dd("URL NO VALIDA");
+    }
+    dd($url);
   }
 
   if($proceso == TRUE){
@@ -181,77 +253,6 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
   }
   
   return $form[$wrapperId];
-}
-
-function gcaba_drupal_form_render_fields($form,$nodeData){
-  $fields = gcaba_drupal_form_get_fields($nodeData->field_gcaba_form_fields);
-
-  foreach ($fields as $v) {
-    switch ($v['type']) {
-      case 'TEXT':
-        $form = gcaba_drupal_form_render_field_text($v,$form);
-        break;
-      case 'SELECT':
-        $form = gcaba_drupal_form_render_field_select($v,$form);
-        break;
-      case 'TEXTAREA':
-        $form = gcaba_drupal_form_render_field_textarea($v,$form);
-        break;
-      case 'RADIO':
-        $form = gcaba_drupal_form_render_field_radio($v,$form);
-        break;
-      case 'CHECKBOX':
-        $form = gcaba_drupal_form_render_field_checkbox($v,$form);
-        break;
-      case 'RECAPTCHA':
-        $form = gcaba_drupal_form_render_field_recaptcha($v,$form);
-        break;
-    }
-
-  }
-  return $form;
-
-}
-
-function gcaba_drupal_form_get_fields($fields){
-  $ids = array();
-
-  $language = LANGUAGE_NONE;
-  foreach ($fields[$language] as $key => $value) {
-    $ids[]=(int)$value["target_id"];
-  }
-
-  $fields = node_load_multiple($ids);
-
-  $cleanFields = array();
-
-  foreach ($fields as $key => $v) {
-    // Parse OPTIONS var
-    $result_final = array();
-    $result = explode( "\n", (count($v->field_field_gcaba_form_options)>0)?$v->field_field_gcaba_form_options[$language][0]["value"]:'' );
-    foreach ($result as $key => $value) {
-      $tmp = explode("|", $value);
-      $result_final[$tmp[0]] = $tmp[1];
-    }
-    // End parse
-
-    $f = array(
-      'id'              => $v->nid,
-      'title'           => $v->title,
-      'type'            => $v->field_gcaba_form_field_type[$language][0]["value"],
-      'options'         => $result_final,
-      'validators'      => (count($v->field_gcaba_form_validators)>0)?$v->field_gcaba_form_validators[$language][0]["value"]:'',
-      'placeholder'     => (count($v->field_gcaba_form_placeholder)>0)?$v->field_gcaba_form_placeholder[$language][0]["value"]:'',
-      'label'           => (count($v->field_gcaba_form_label)>0)?$v->field_gcaba_form_label[$language][0]["value"]:'',
-      'help'            => (count($v->field_gcaba_form_help)>0)?$v->field_gcaba_form_help[$language][0]["value"]:'',
-      'initial_value'   => (count($v->field_gcaba_form_initial_value)>0)?$v->field_gcaba_form_initial_value[$language][0]["value"]:'',
-      'order'           => (count($v->field_field_gcaba_form_order)>0)?$v->field_field_gcaba_form_order[$language][0]["value"]:'',
-    );
-
-    $cleanFields[] = $f;
-  }
-
-  return $cleanFields;
 }
 
 ?>
