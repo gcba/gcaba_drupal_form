@@ -541,7 +541,7 @@ class GCABAFormsFieldBasicController
     $entity->placeholder = '';
     $entity->value = '';
     $entity->label = '';
-    //$entity->order = 0;
+    $entity->validators = '';
     $entity->options = '';
     return $entity;
   }

@@ -108,6 +108,13 @@ function gcaba_drupal_form_schema() {
           'not null' => TRUE,
           'default' => '',
         ),
+
+        'validators' => array(
+          'description' => 'Array of validations.',
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => FALSE
+        ),
         
         'help' => array(
           'description' => 'Field help',

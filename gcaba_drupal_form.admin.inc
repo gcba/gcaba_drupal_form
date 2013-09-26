@@ -52,7 +52,7 @@ function gcaba_drupal_form_forms_validate($form, &$form_state, $id = NULL) {
   if ($form_state['triggering_element']['#value'] == t('Back')) {
     return;
   }  
-     
+  
   switch ($form_state['stage']) { 
        
     case 'step_1':
@@ -97,7 +97,10 @@ function gcaba_drupal_form_forms_submit($form, &$form_state){
 		    $entity->value 		= $form_state['values']['value'];
 		    $entity->label 		= $form_state['values']['label'];
 		    $entity->options 	= $form_state['values']['options'];
-		    //$entity->order 	= $form_state['values']['order'];
+		    $entity->validators = serialize($form_state['values']['validators']);
+
+
+		   
 		    field_attach_submit('gcaba_forms_fields', $entity, $form, $form_state);
 		    $entity = gcaba_forms_fields_save($entity);
 			
@@ -144,6 +147,14 @@ function gcaba_drupal_form_forms_step_3($form, &$form_state){
     '#value' => $entity,
   );
 
+	$field_validators = drupal_map_assoc(array(
+		t('REQUERIDO'), 
+		t('URL'),
+		t('EMAIL'),
+		t('NUMERIC'),
+		t('NON-NUMERIC'),
+	));
+
   field_attach_form('gcaba_forms_fields', $entity, $form, $form_state);
 
 	/* Field types */
@@ -181,6 +192,13 @@ function gcaba_drupal_form_forms_step_3($form, &$form_state){
 			'#description' => t('Field type.'),
 			'#required'     => TRUE,
 	);
+
+	$form['step_3']['validators'] = array(
+			'#type' => 'checkboxes',
+			'#title' => t('Validators'),			
+			'#options' => $field_validators,
+			'#description' => t('Field validators.'),
+	);
 	$form['step_3']['help'] = array(
 			'#type'         => 'textfield',
 			'#title'        => t('Help'),
@@ -217,15 +235,7 @@ function gcaba_drupal_form_forms_step_3($form, &$form_state){
 			'#maxlength'    => 400,
 			'#required'     => FALSE,
 	);
-	$form['step_3']['order'] = array(
-			'#type'         => 'textfield',
-			'#title'        => t('Order'),
-			'#description'  => t("Filds order"),
-			'#default_value'=> "",
-			'#size'         => 10,
-			'#maxlength'    => 2,
-			'#required'     => TRUE,
-	);
+
 	$form['step_3']['options'] = array(
 			'#type'         => 'textarea',
 			'#title'        => t('Options'),
@@ -474,7 +484,7 @@ function gcaba_drupal_form_forms_step_1($form, &$form_state, $id = NULL){
     $form['step_1']['success_text'] = array(
         '#type' => 'textfield', 
         '#title' => t('Success Text'), 
-        '#default_value' => isset($values['success_text']) ? $values['success_text'] : "The form was processed correctly",
+        '#default_value' => empty($entity->success_text) ? "The form was processed correctly" : $entity->success_text,
         '#description'  => t('Text displayed when the form is processed correctly.'), 
         '#size' => 60, 
         '#maxlength' => 400,
@@ -484,7 +494,7 @@ function gcaba_drupal_form_forms_step_1($form, &$form_state, $id = NULL){
         '#type' => 'textfield', 
         '#title' => t('URL for API REST'), 
         '#description'  => t('URL where POST form results.'),
-        '#default_value' => isset($values['urlapi']) ? $values['urlapi'] : NULL,
+        '#default_value' => empty($entity->url) ? NULL : $entity->url,
         '#size' => 100, 
         '#maxlength' => 800,
         '#required' => FALSE,
@@ -493,7 +503,7 @@ function gcaba_drupal_form_forms_step_1($form, &$form_state, $id = NULL){
         '#type' => 'textfield', 
         '#title' => t('Emails'), 
         '#description'  => t('Comma-separated emails list where send form results.'),
-        '#default_value' => isset($values['toemails']) ? $values['toemails'] : NULL,
+        '#default_value' => empty($entity->emails) ? NULL : $entity->emails,
         '#size' => 100, 
         '#maxlength' => 800,
         '#required' => FALSE,

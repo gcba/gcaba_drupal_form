@@ -121,13 +121,12 @@ function gcaba_drupal_form_get_fields($fields){
     }
 
     // TODO: Ugli...
-    // TODO: No andan los validators
     $f = array(
       'id'              => $v->basic_id,
       'title'           => $v->title,
       'type'            => $v->type,
       'options'         => $result_final,
-      'validators'      => $v->validators,
+      'validators'      => unserialize($v->validators),
       'placeholder'     => $v->placeholder,
       'label'           => $v->label,
       'help'            => $v->help,
@@ -152,38 +151,42 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
   
   foreach ($form_state['input'] as $key => $value) {
     if (!strncmp($key, $prefix, strlen($prefix))){
-      $field_node = node_load($form[$key]['#attributes']['data-id']);
+      $field_node = gcaba_forms_fields_load($form[$key]['#attributes']['data-id']);
 
-      foreach ($field_node->field_gcaba_form_validators[$language] as $key1 => $value1) {
-        switch ($value1["value"]) {
-          case 'REQUERIDO':
-            if (empty($value)){
-              array_push($errors, t("Field <b>").$field_node->title. t("</b> is required."));
-            }
-            break;
-          case 'URL':
-            if (!valid_url($value)){
-              array_push($errors, t("Field <b>").$field_node->title. t("</b> is not an URL."));
-            }
-            break;
-          case 'EMAIL':
-            if (!valid_email_address($value)){
-              array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a valid email address."));
-            }
-            break;
-          case 'NUMERIC':
-            if (!is_numeric($value)){
-              array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a number."));
-            }
-            break;
-          case 'NON-NUMERIC':
-            if (is_numeric($value)){
-              array_push($errors, t("Field <b>").$field_node->title. t("</b> must not be a number."));
-            }
-            break;
+      foreach (unserialize($field_node->validators) as $key1 => $value1) {
+        if($value1 != "0"){
+          switch ($value1) {
+            case 'REQUERIDO':
+              if (empty($value)){
+                array_push($errors, t("Field <b>").$field_node->title. t("</b> is required."));
+              }
+              break;
+            case 'URL':
+              if (!valid_url($value)){
+                array_push($errors, t("Field <b>").$field_node->title. t("</b> is not an URL."));
+              }
+              break;
+            case 'EMAIL':
+              if (!valid_email_address($value)){
+                array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a valid email address."));
+              }
+              break;
+            case 'NUMERIC':
+              if (!is_numeric($value)){
+                array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a number."));
+              }
+              break;
+            case 'NON-NUMERIC':
+              if (is_numeric($value)){
+                array_push($errors, t("Field <b>").$field_node->title. t("</b> must not be a number."));
+              }
+              break;
+          }
+          array_push($valores, array($field_node->title, $value));
         }
+
       }
-      array_push($valores, array($field_node->title, $value));
+
     }
   }
 
@@ -201,7 +204,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 
   // Send mail
   if($tomail && $proceso){
-    $emails = explode(",", trim( $form_node->field_gcaba_form_toemails[$language][0]['safe_value'] ) );
+    $emails = explode(",", trim( $form_entity->emails));
     array_walk($emails, 'trim_value');
 
     $body = "";
@@ -215,7 +218,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 
       $params = array(
         'body' => $body,
-        'subject' => $form_node->title,
+        'subject' => $form_entity->title,
       );
 
       if (!drupal_mail('gcaba_drupal_form', 'gcaba_drupal_form_email', $email, language_default(), $params, $from, TRUE)){
@@ -227,7 +230,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 dd($valores);
   // Save it to API List
   if($toapi && $proceso){
-    $url = $form_node->field_gcaba_form_urlapi[$language][0]['safe_value'];
+    $url = $form_entity->url;
     if(valid_url($url, TRUE)){
       
       $options = array(
@@ -245,8 +248,8 @@ dd($valores);
   }
 
   if($proceso == TRUE){
-    if($form_node->field_gcaba_form_success_text[$language][0]['safe_value'] != ''){
-      $form[$wrapperId]['#markup'] = $form_node->field_gcaba_form_success_text[$language][0]['safe_value'] ;
+    if($form_entity->success_text != ''){
+      $form[$wrapperId]['#markup'] = $form_entity->success_text ;
     }else{
       $form[$wrapperId]['#markup'] = t('El formulario fue procesado correctamente.');
     }
