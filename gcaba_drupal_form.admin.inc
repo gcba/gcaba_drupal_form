@@ -164,7 +164,7 @@ function gcaba_drupal_form_forms_step_3($form, &$form_state){
 			'SELECT' => 'SELECT',
 			'RADIO' => 'RADIO',
 			'CHECKBOX' => 'CHECKBOX',
-			'RECAPTCHA' => 'RECAPTCHA'
+//			'RECAPTCHA' => 'RECAPTCHA'
 	);
 	
 	/* Add new field */

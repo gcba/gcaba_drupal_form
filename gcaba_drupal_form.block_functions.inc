@@ -93,9 +93,9 @@ function gcaba_drupal_form_render_fields($form, $form_entity){
       case 'CHECKBOX':
         $form = gcaba_drupal_form_render_field_checkbox($v, $form);
         break;
-      case 'RECAPTCHA':
-        $form = gcaba_drupal_form_render_field_recaptcha($v, $form);
-        break;
+//      case 'RECAPTCHA':
+//        $form = gcaba_drupal_form_render_field_recaptcha($v, $form);
+//        break;
     }
 
   }
@@ -227,7 +227,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
     }
   }
 
-dd($valores);
+/*
   // Save it to API List
   if($toapi && $proceso){
     $url = $form_entity->url;
@@ -246,6 +246,7 @@ dd($valores);
     }
     dd($url);
   }
+*/
 
   if($proceso == TRUE){
     if($form_entity->success_text != ''){
@@ -254,7 +255,7 @@ dd($valores);
       $form[$wrapperId]['#markup'] = t('El formulario fue procesado correctamente.');
     }
   }
-  
+
   return $form[$wrapperId];
 }
 
