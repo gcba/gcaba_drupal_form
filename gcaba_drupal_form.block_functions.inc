@@ -209,7 +209,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 
     $body = "";
     foreach ($valores as $key5 => $value5) {
-      $body .= $value5[0]. ": ".$value5[1]."<br>";
+      $body .= $value5[0]. ": ".$value5[1]."<br />";
     }
 
     foreach ($emails as $key => $email) {
@@ -217,18 +217,26 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
       $from = 'noreply@buenosaires.gob.ar';
 
       $params = array(
-        'body' => $body,
         'subject' => $form_entity->title,
       );
+      $params['body'] = array(t($body));  
 
-      if (!drupal_mail('gcaba_drupal_form', 'gcaba_drupal_form_email', $email, language_default(), $params, $from, TRUE)){
+      drupal_mail('gcaba_drupal_form', 'gcaba_drupal_form_email', $email, language_default(), $params, $from, TRUE);
+      
+      if (!sent){
         $proceso == FALSE;
       }
     }
   }
 
+
+/**
+ * Implements hook_mail().
+ */
+
+
 /*
-  // Save it to API List
+  // Save it to API List coming soon
   if($toapi && $proceso){
     $url = $form_entity->url;
     if(valid_url($url, TRUE)){
@@ -258,5 +266,17 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 
   return $form[$wrapperId];
 }
+
+/**
+ * Implements hook_mail().
+ */
+function gcaba_drupal_form_mail($key, &$message, $params) {
+  if ($key == 'gcaba_drupal_form_email') {
+    $message['subject'] = $params['subject'];
+    $message['body'] = $params['body'];
+    $message['headers'] = $params['headers'];
+  }
+}
+
 
 ?>
