@@ -7,9 +7,8 @@ function gcaba_drupal_form_render_field_text($field, $form) {
     '#value'  => "",
     '#attributes' => array(
       'data-id' => $field['id'],
-      'class' => array('gcaba_drupal_form_render_field_text')
-      //'onfocus' => array('if(this.value == "'.$field['placeholder'].'") { this.value = ""; }'),
-      //'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
+      'class' => array('gcaba_drupal_form_render_field_text', "button-form-custom"),
+      'placeholder'=> array($field['placeholder'])  
     ),
   );
 
@@ -37,8 +36,7 @@ function gcaba_drupal_form_render_field_textarea($field,$form) {
     '#attributes' => array(
       'data-id' => $field['id'],
       'class' => array('gcaba_drupal_form_render_field_textarea'),
-      'onfocus' => array('if(this.value == "'.$field['placeholder'].'") { this.value = ""; }'),
-      'onblur' => array('if(this.value == "") { this.value = "'.$field['placeholder'].'"; }')
+      'placeholder'=> array($field['placeholder'])
     ),
   );
 

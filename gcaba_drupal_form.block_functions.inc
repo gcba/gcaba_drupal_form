@@ -59,13 +59,14 @@ function gcaba_drupal_form_render($form, &$form_state, $id) {
       'wrapper' => $wrapperId,
       'progress' => array('type' => 'throbber','message' => '<div class="feedback form_loading">Consultando...</div>'),
       'method' => 'replace',
-      'effect' => 'fade'
+      'effect' => 'fade',
+      'class' => 'input.form-submit'
     )
   );
 
   $form[$wrapperId] = array(
       '#type' => 'markup',
-      '#prefix' => '<div id="'.  $wrapperId . '" class="feedback email form_error">',
+      '#prefix' => '<div id="'.  $wrapperId . '" class="feedback email">',
       '#suffix' => '</div>',
       '#markup' => ''
   );
@@ -93,12 +94,46 @@ function gcaba_drupal_form_render_fields($form, $form_entity){
       case 'CHECKBOX':
         $form = gcaba_drupal_form_render_field_checkbox($v, $form);
         break;
-//      case 'RECAPTCHA':
-//        $form = gcaba_drupal_form_render_field_recaptcha($v, $form);
-//        break;
+      case 'RECAPTCHA':
+        $form = gcaba_drupal_form_render_field_recaptcha($v, $form);
+        break;
     }
 
+
   }
+
+  //ugly captcha
+  $form['captcha'] = array(
+    '#type' => 'markup',
+    '#markup' => '<div id="recaptcha_div"></div><div id="recaptcha_widget" style="display:none">
+
+                       <div id="recaptcha_image"></div>
+                       <div class="recaptcha_only_if_incorrect_sol" style="color:red">Incorrecto, por favor intente de nuevo</div>
+
+                       <span class="recaptcha_only_if_image">Ingrese las palabras de arriba:</span>
+                       <span class="recaptcha_only_if_audio">Ingrese los números que escuche:</span>
+
+                       <input type="text" id="recaptcha_response_field" name="recaptcha_response_field" />
+                      
+                       <ul id="recaptcha_options">
+                       <li class="first"><div><a href="javascript:Recaptcha.reload()">Nuevo código</a></div></li>
+                       <li class="last"><div class="recaptcha_only_if_image"><a href="javascript:Recaptcha.switch_type(\'audio\');">Audio</a></div>
+                       <div class="recaptcha_only_if_audio"><a href="javascript:Recaptcha.switch_type(\'image\');">Imagen</a></div></li>
+                       </ul>
+                     </div>
+
+                     <script type="text/javascript"
+                        src="http://www.google.com/recaptcha/api/challenge?k=6LddOs8SAAAAAKwxz9Et9Lujx2YVb0LBft3PB1-G">
+                     </script>
+                     <noscript>
+                       <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LddOs8SAAAAAKwxz9Et9Lujx2YVb0LBft3PB1-G"
+                            height="300" width="500" frameborder="0"></iframe><br>
+                       <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+                       </textarea>
+                       <input type="hidden" name="recaptcha_response_field"
+                            value="manual_challenge">
+                     </noscript>',
+  );
   return $form;
 
 }
@@ -156,7 +191,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
       foreach (unserialize($field_node->validators) as $key1 => $value1) {
         if($value1 != "0"){
           switch ($value1) {
-            case 'REQUERIDO':
+            case 'REQUERIDO'://
               if (empty($value)){
                 array_push($errors, t("Field <b>").$field_node->title. t("</b> is required."));
               }
@@ -189,10 +224,20 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 
     }
   }
+  require_once('recaptcha/recaptchalib.php');
+  $privatekey = "6LddOs8SAAAAAHBYfSCGWkS_4QDSsx7dnSg7u4-5";
+  $resp = recaptcha_check_answer ($privatekey,
+                                $_SERVER["REMOTE_ADDR"],
+                                $_POST["recaptcha_challenge_field"],
+                                $_POST["recaptcha_response_field"]);
+
+  if (!$resp->is_valid) {
+    return array("#markup" => "<div id='gcaba_email_result' class='email form_error'>El Captcha no fue correctamente ingresado.</div><script>Recaptcha.reload();</script>");    
+  }
 
   $proceso = TRUE;
   if(count($errors) > 0){
-    $html = "<ul class='error'>";
+    $html = "<ul class='text-error alert alert-error error-formulario'>";
     foreach ($errors as $key => $value) {
       $html .= "<li>".$value."</li>";
     }
@@ -202,6 +247,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
     $proceso = FALSE;
   }
 
+  
   // Send mail
   if($tomail && $proceso){
     $emails = explode(",", trim( $form_entity->emails));
@@ -228,12 +274,6 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
       }
     }
   }
-
-
-/**
- * Implements hook_mail().
- */
-
 
 /*
   // Save it to API List coming soon
