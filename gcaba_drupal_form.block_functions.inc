@@ -230,7 +230,6 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
                                 $_SERVER["REMOTE_ADDR"],
                                 $_POST["recaptcha_challenge_field"],
                                 $_POST["recaptcha_response_field"]);
-
   if (!$resp->is_valid) {
     return array("#markup" => "<div id='gcaba_email_result' class='email form_error'>El Captcha no fue correctamente ingresado.</div><script>Recaptcha.reload();</script>");    
   }
@@ -255,7 +254,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
 
     $body = "";
     foreach ($valores as $key5 => $value5) {
-      $body .= $value5[0]. ": ".$value5[1]."<br />";
+      $body .= $value5[0]. ": ".$value5[1]."\n";
     }
 
     foreach ($emails as $key => $email) {
