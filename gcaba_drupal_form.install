@@ -9,172 +9,164 @@
  */
 function gcaba_drupal_form_schema() {
   $schema = array();
-  //ugly verification. must implement uninstall hook
-  if(db_table_exists('gcaba_forms_forms')){
-    drupal_set_message($message = "Las tablas ya existen", $type = 'status');
-    return $schema;
-  }else{
-          $schema['gcaba_forms_forms'] = array(
-        'description' => 'The base table for our basic entity.',
-          'fields' => array(
-            'basic_id' => array(
-              'description' => 'Primary key of the basic entity.',
-              'type' => 'serial',
-              'unsigned' => TRUE,
-              'not null' => TRUE,
-            ),
 
-            'bundle_type' => array(
-              'description' => 'The bundle type',
-              'type' => 'text',
-              'size' => 'medium',
-              'not null' => TRUE
-            ),
-
-            'title' => array(
-              'description' => 'Form title',
-              'type' => 'varchar',
-              'length' => 255,
-              'not null' => TRUE,
-              'default' => '',
-            ),
-
-            'success_text' => array(
-              'description' => 'The default success message, always treated a non-markup plain text.',
-              'type' => 'varchar',
-              'length' => 500,
-              'not null' => TRUE,
-              'default' => ''
-            ),
-         
-            'emails' => array(
-              'description' => 'A list of emails separated by a colon, always treated a non-markup plain text.',
-              'type' => 'varchar',
-              'length' => 500,
-              'not null' => TRUE,
-              'default' => ''
-            ),
-            
-            'url' => array(
-              'description' => 'The URL for REST API, always treated a non-markup plain text.',
-              'type' => 'varchar',
-              'length' => 500,
-              'not null' => TRUE,
-              'default' => ''
-            ),
-
-            'fields' => array(
-              'description' => 'Array of fields.',
-              'type' => 'text',
-              'size' => 'big',
-              'not null' => FALSE
-            ),
-
-            'created' => array(
-              'description' => 'The Unix timestamp of the entity creation time.',
-              'type' => 'int',
-              'not null' => TRUE,
-              'default' => 0,
-            ),
-          ),
-        'primary key' => array('basic_id'),
-      );
-      
-        $schema['gcaba_forms_fields'] = array(
-      'description' => 'The base table for our basic entity.',
-        'fields' => array(
-          'basic_id' => array(
-            'description' => 'Primary key of the basic entity.',
-            'type' => 'serial',
-            'unsigned' => TRUE,
-            'not null' => TRUE,
-          ),
-
-          'bundle_type' => array(
-            'description' => 'The bundle type',
-            'type' => 'text',
-            'size' => 'medium',
-            'not null' => TRUE
-          ),
-
-          'title' => array(
-            'description' => 'Field title',
-            'type' => 'varchar',
-            'length' => 255,
-            'not null' => TRUE,
-            'default' => '',
-          ),
-
-          'type' => array(
-            'description' => 'Field type',
-            'type' => 'varchar',
-            'length' => 100,
-            'not null' => TRUE,
-            'default' => '',
-          ),
-
-          'validators' => array(
-            'description' => 'Array of validations.',
-            'type' => 'text',
-            'size' => 'big',
-            'not null' => FALSE
-          ),
-          
-          'help' => array(
-            'description' => 'Field help',
-            'type' => 'varchar',
-            'length' => 300,
-            'not null' => FALSE,
-            'default' => '',
-          ),
-          
-          'placeholder' => array(
-            'description' => 'Field helper',
-            'type' => 'varchar',
-            'length' => 100,
-            'not null' => FALSE,
-            'default' => '',
-          ),
-          
-          'value' => array(
-            'description' => 'Field initial value',
-            'type' => 'varchar',
-            'length' => 100,
-            'not null' => FALSE,
-            'default' => '',
-          ),
-          
-          'label' => array(
-            'description' => 'Field label',
-            'type' => 'varchar',
-            'length' => 400,
-            'not null' => FALSE,
-            'default' => '',
-          ),
-
-          'options' => array(
-            'description' => 'Field options',
-            'type' => 'varchar',
-            'length' => 800,
-            'not null' => FALSE,
-            'default' => '',
-          ),
-          
-          'created' => array(
-            'description' => 'The Unix timestamp of the entity creation time.',
-            'type' => 'int',
-            'not null' => TRUE,
-            'default' => 0,
-          ),
+  $schema['gcaba_forms_forms'] = array(
+    'description' => 'The base table for our basic entity.',
+      'fields' => array(
+        'basic_id' => array(
+          'description' => 'Primary key of the basic entity.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
         ),
-      'primary key' => array('basic_id'),
-    );
-  
+
+        'bundle_type' => array(
+          'description' => 'The bundle type',
+          'type' => 'text',
+          'size' => 'medium',
+          'not null' => TRUE
+        ),
+
+        'title' => array(
+          'description' => 'Form title',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+
+        'success_text' => array(
+          'description' => 'The default success message, always treated a non-markup plain text.',
+          'type' => 'varchar',
+          'length' => 500,
+          'not null' => TRUE,
+          'default' => ''
+        ),
+     
+        'emails' => array(
+          'description' => 'A list of emails separated by a colon, always treated a non-markup plain text.',
+          'type' => 'varchar',
+          'length' => 500,
+          'not null' => TRUE,
+          'default' => ''
+        ),
+        
+        'url' => array(
+          'description' => 'The URL for REST API, always treated a non-markup plain text.',
+          'type' => 'varchar',
+          'length' => 500,
+          'not null' => TRUE,
+          'default' => ''
+        ),
+
+        'fields' => array(
+          'description' => 'Array of fields.',
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => FALSE
+        ),
+
+        'created' => array(
+          'description' => 'The Unix timestamp of the entity creation time.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+      ),
+    'primary key' => array('basic_id'),
+  );
+
+  $schema['gcaba_forms_fields'] = array(
+    'description' => 'The base table for our basic entity.',
+      'fields' => array(
+        'basic_id' => array(
+          'description' => 'Primary key of the basic entity.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+
+        'bundle_type' => array(
+          'description' => 'The bundle type',
+          'type' => 'text',
+          'size' => 'medium',
+          'not null' => TRUE
+        ),
+
+        'title' => array(
+          'description' => 'Field title',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+
+        'type' => array(
+          'description' => 'Field type',
+          'type' => 'varchar',
+          'length' => 100,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+
+        'validators' => array(
+          'description' => 'Array of validations.',
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => FALSE
+        ),
+        
+        'help' => array(
+          'description' => 'Field help',
+          'type' => 'varchar',
+          'length' => 300,
+          'not null' => FALSE,
+          'default' => '',
+        ),
+        
+        'placeholder' => array(
+          'description' => 'Field helper',
+          'type' => 'varchar',
+          'length' => 100,
+          'not null' => FALSE,
+          'default' => '',
+        ),
+        
+        'value' => array(
+          'description' => 'Field initial value',
+          'type' => 'varchar',
+          'length' => 100,
+          'not null' => FALSE,
+          'default' => '',
+        ),
+        
+        'label' => array(
+          'description' => 'Field label',
+          'type' => 'varchar',
+          'length' => 400,
+          'not null' => FALSE,
+          'default' => '',
+        ),
+
+        'options' => array(
+          'description' => 'Field options',
+          'type' => 'varchar',
+          'length' => 800,
+          'not null' => FALSE,
+          'default' => '',
+        ),
+        
+        'created' => array(
+          'description' => 'The Unix timestamp of the entity creation time.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+      ),
+    'primary key' => array('basic_id'),
+  );
+
   return $schema;
-
-  }
-  
-
 }
 
 
