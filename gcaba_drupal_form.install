@@ -11,7 +11,8 @@ function gcaba_drupal_form_schema() {
   $schema = array();
   //ugly verification. must implement uninstall hook
   if(db_table_exists('gcaba_forms_forms')){
-    drupal_set_message($message = "Las tablas ya existen", $type = 'status');  
+    drupal_set_message($message = "Las tablas ya existen", $type = 'status');
+    return $schema;
   }else{
           $schema['gcaba_forms_forms'] = array(
         'description' => 'The base table for our basic entity.',
@@ -173,7 +174,7 @@ function gcaba_drupal_form_schema() {
 
   }
   
-  
+
 }
 
 
