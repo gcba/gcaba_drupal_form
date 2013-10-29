@@ -38,6 +38,12 @@ function gcaba_drupal_form_block_view($delta = '') {
 }
 
 function gcaba_drupal_form_render($form, &$form_state, $id) {
+    drupal_add_js('http://www.google.com/recaptcha/api/js/recaptcha_ajax.js');
+  drupal_add_js(' var RecaptchaOptions = {
+    theme : "custom",
+    custom_theme_widget: "recaptcha_widget"
+ };', 'inline');
+  
   $entity = gcaba_forms_forms_load($id);
 
   $form['#attributes']['id'] = 'gcaba_drupal_form_render_form_'.$id;

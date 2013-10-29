@@ -2,6 +2,7 @@ name = GCABA Drupal Forms
 description = Allows you to generate forms dynamically with server and client side validations
 core = 7.x
 package = GCABA
+
 files[] = gcaba_drupal_form.module
 dependencies[] = entity
 dependencies[] = ctools
