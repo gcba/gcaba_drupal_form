@@ -43,7 +43,7 @@ function gcaba_drupal_form_render($form, &$form_state, $id) {
     theme : "custom",
     custom_theme_widget: "recaptcha_widget"
  };', 'inline');
-  
+
   $entity = gcaba_forms_forms_load($id);
 
   $form['#attributes']['id'] = 'gcaba_drupal_form_render_form_'.$id;
@@ -65,14 +65,13 @@ function gcaba_drupal_form_render($form, &$form_state, $id) {
       'wrapper' => $wrapperId,
       'progress' => array('type' => 'throbber','message' => '<div class="feedback form_loading">Consultando...</div>'),
       'method' => 'replace',
-      'effect' => 'fade',
-      'class' => 'input.form-submit'
+      'effect' => 'fade'
     )
   );
 
   $form[$wrapperId] = array(
       '#type' => 'markup',
-      '#prefix' => '<div id="'.  $wrapperId . '" class="feedback email">',
+      '#prefix' => '<div id="'. $wrapperId.'">',
       '#suffix' => '</div>',
       '#markup' => ''
   );
@@ -300,12 +299,13 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
     dd($url);
   }
 */
-
+    
   if($proceso == TRUE){
+    
     if($form_entity->success_text != ''){
-      $form[$wrapperId]['#markup'] = $form_entity->success_text ;
+      $form[$wrapperId]['#markup'] = '<div class= "alert alert-success">'.$form_entity->success_text.'</div>';
     }else{
-      $form[$wrapperId]['#markup'] = t('El formulario fue procesado correctamente.');
+      $form[$wrapperId]['#markup'] = '<div class= "alert alert-success">'.t('El formulario fue procesado correctamente.').'</div>';
     }
   }
 
