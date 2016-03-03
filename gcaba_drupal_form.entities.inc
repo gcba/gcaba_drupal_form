@@ -243,6 +243,9 @@ function gcaba_drupal_form_permission() {
     'create gcaba_forms_fields entities' => array(
       'title' => t('Create GCABA Forms Field Entities'),
     ),
+    'delete any gcaba_forms_forms entity' => array(
+      'title' => t('Delete any GCABA Forms Forms entity'),
+    ),
   );
   return $permissions;
 }
@@ -543,6 +546,8 @@ class GCABAFormsFieldBasicController
     $entity->label = '';
     $entity->validators = '';
     $entity->options = '';
+    $entity->openIDname = '';
+
     return $entity;
   }
 

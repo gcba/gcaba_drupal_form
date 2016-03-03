@@ -38,13 +38,24 @@ function gcaba_drupal_form_block_view($delta = '') {
 }
 
 function gcaba_drupal_form_render($form, &$form_state, $id) {
-    drupal_add_js('http://www.google.com/recaptcha/api/js/recaptcha_ajax.js');
+  drupal_add_js('http://www.google.com/recaptcha/api/js/recaptcha_ajax.js');
   drupal_add_js(' var RecaptchaOptions = {
     theme : "custom",
     custom_theme_widget: "recaptcha_widget"
  };', 'inline');
 
+  drupal_add_js(drupal_get_path('module', 'gcaba_drupal_form') . '/js/baid.js',array('type' => 'file', 'scope' => 'footer'));
+    
+  //Agrega los script para fix de jQuery - Drupal Form Ajax
+  _gcaba_drupal_form_jquery_fix();
+
   $entity = gcaba_forms_forms_load($id);
+
+
+  $form['Loggearse'] = array(
+    '#type' => 'markup',
+    '#prefix' => '<div id="miba_usardatos" style="color:blue;text-decoration:underline;cursor:pointer;float:right;font-size:12px" >No soy esa persona</div>',
+  );
 
   $form['#attributes']['id'] = 'gcaba_drupal_form_render_form_'.$id;
 
@@ -56,6 +67,7 @@ function gcaba_drupal_form_render($form, &$form_state, $id) {
 
   $wrapperId = 'gcaba_drupal_form_result_'.$id;
 
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Enviar'),
@@ -66,12 +78,23 @@ function gcaba_drupal_form_render($form, &$form_state, $id) {
       'progress' => array('type' => 'throbber','message' => '<div class="feedback form_loading">Consultando...</div>'),
       'method' => 'replace',
       'effect' => 'fade'
+    ),
+     // se le agrega a la clase btn-lg btn-block
+    '#attributes' => array(
+      'class' => array(' btn-lg btn-block')
     )
   );
 
-  $form[$wrapperId] = array(
+$form['footer'] = array(
       '#type' => 'markup',
-      '#prefix' => '<div id="'. $wrapperId.'">',
+      '#prefix' => '<div class="gcaba_form_footer">',
+      '#suffix' => '</div>',
+      '#markup' => $entity->footer
+  );
+
+$form['error'] = array(
+      '#type' => 'markup',
+      '#prefix' => '<div id="'.$wrapperId.'">',
       '#suffix' => '</div>',
       '#markup' => ''
   );
@@ -90,6 +113,9 @@ function gcaba_drupal_form_render_fields($form, $form_entity){
       case 'SELECT':
         $form = gcaba_drupal_form_render_field_select($v, $form);
         break;
+      case 'SELECTCHOSEN':
+        $form = gcaba_drupal_form_render_field_select_chosen($v, $form);
+        break;
       case 'TEXTAREA':
         $form = gcaba_drupal_form_render_field_textarea($v, $form);
         break;
@@ -101,6 +127,15 @@ function gcaba_drupal_form_render_fields($form, $form_entity){
         break;
       case 'RECAPTCHA':
         $form = gcaba_drupal_form_render_field_recaptcha($v, $form);
+        break;
+      case 'FILE':
+        $form = gcaba_drupal_form_render_field_file($v, $form);
+        break;
+      case 'TITLE':
+        $form = gcaba_drupal_form_render_field_title($v, $form);
+        break;
+      case 'SELECTTOMAIL':
+        $form = gcaba_drupal_form_render_field_selecttomail($v, $form);
         break;
     }
 
@@ -114,7 +149,6 @@ function gcaba_drupal_form_render_fields($form, $form_entity){
 
                        <div id="recaptcha_image"></div>
                        <div class="recaptcha_only_if_incorrect_sol" style="color:red">Incorrecto, por favor intente de nuevo</div>
-
                        <span class="recaptcha_only_if_image">Ingrese las palabras de arriba:</span>
                        <span class="recaptcha_only_if_audio">Ingrese los números que escuche:</span>
 
@@ -171,6 +205,7 @@ function gcaba_drupal_form_get_fields($fields){
       'label'           => $v->label,
       'help'            => $v->help,
       'initial_value'   => $v->value,
+      'openIDname'      => $v->openIDname
     );
     $cleanFields[] = $f;
   }
@@ -187,48 +222,31 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
   $tomail     = $form_entity->emails  == '' ? FALSE : TRUE;
   $toapi      = $form_entity->url     == '' ? FALSE : TRUE;
 
-  $wrapperId = 'gcaba_drupal_form_result_' . $form['#attributes']['data-id'] ;
-  
+  $wrapperId = 'gcaba_drupal_form_result_' . $form['#attributes']['data-id'];
+
+  $archivos = array();
+  $attachments = array();
+
+  $mailsto = array();
+
+
+  /*
+   * Se recorren los elementos del form,
+   * si son del drupal_form se validan y agregan al acumulador
+   */
   foreach ($form_state['input'] as $key => $value) {
     if (!strncmp($key, $prefix, strlen($prefix))){
       $field_node = gcaba_forms_fields_load($form[$key]['#attributes']['data-id']);
 
-      foreach (unserialize($field_node->validators) as $key1 => $value1) {
-        if($value1 != "0"){
-          switch ($value1) {
-            case 'REQUERIDO'://
-              if (empty($value)){
-                array_push($errors, t("Field <b>").$field_node->title. t("</b> is required."));
-              }
-              break;
-            case 'URL':
-              if (!valid_url($value)){
-                array_push($errors, t("Field <b>").$field_node->title. t("</b> is not an URL."));
-              }
-              break;
-            case 'EMAIL':
-              if (!valid_email_address($value)){
-                array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a valid email address."));
-              }
-              break;
-            case 'NUMERIC':
-              if (!is_numeric($value)){
-                array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a number."));
-              }
-              break;
-            case 'NON-NUMERIC':
-              if (is_numeric($value)){
-                array_push($errors, t("Field <b>").$field_node->title. t("</b> must not be a number."));
-              }
-              break;
-          }
-          array_push($valores, array($field_node->title, $value));
-        }
+      _gcaba_drupal_form_validate_field($field_node, $key, $value, $errors);
 
-      }
-
+      _gcaba_drupal_form_get_value($key, $value, $field_node, $form_state, $valores, $archivos, $mailsto);
     }
-  }
+  }//end foreach ($form_state['input'] as $key => $value)
+  
+  /*
+   * BEGIN Captcha
+   */
   require_once('recaptcha/recaptchalib.php');
   $privatekey = "6LddOs8SAAAAAHBYfSCGWkS_4QDSsx7dnSg7u4-5";
   $resp = recaptcha_check_answer ($privatekey,
@@ -236,50 +254,32 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
                                 $_POST["recaptcha_challenge_field"],
                                 $_POST["recaptcha_response_field"]);
   if (!$resp->is_valid) {
-    return array("#markup" => "<div id='gcaba_email_result' class='email form_error'>El Captcha no fue correctamente ingresado.</div><script>Recaptcha.reload();</script>");    
+    return array("#markup" => "<div id='".$wrapperId."' class='text-error alert alert-error error-formulario'>El Captcha no fue correctamente ingresado.</div><script>Recaptcha.reload();</script>");    
   }
+  /*
+   * END Captcha
+   */
+
+  _gcaba_drupal_form_save_files($archivos, $attachments, $form_state, $errors);
 
   $proceso = TRUE;
   if(count($errors) > 0){
-    $html = "<ul class='text-error alert alert-error error-formulario'>";
+    $html = "<div id='".$wrapperId."' ><ul class='text-error alert alert-error error-formulario'>";
     foreach ($errors as $key => $value) {
       $html .= "<li>".$value."</li>";
     }
-    $html .= "</ul>";
+    $html .= "</ul><script>Recaptcha.reload();</script></div>";
 
     $form[$wrapperId]['#markup'] = $html;
     $proceso = FALSE;
   }
 
-  
   // Send mail
   if($tomail && $proceso){
-    $emails = explode(",", trim( $form_entity->emails));
-    array_walk($emails, 'trim_value');
-
-    $body = "";
-    foreach ($valores as $key5 => $value5) {
-      $body .= $value5[0]. ": ".$value5[1]."\n";
-    }
-
-    foreach ($emails as $key => $email) {
-      // TODO Valido correo
-      $from = 'noreply@buenosaires.gob.ar';
-
-      $params = array(
-        'subject' => $form_entity->title,
-      );
-      $params['body'] = array(t($body));  
-
-      drupal_mail('gcaba_drupal_form', 'gcaba_drupal_form_email', $email, language_default(), $params, $from, TRUE);
-      
-      if (!sent){
-        $proceso == FALSE;
-      }
-    }
+    _gcaba_drupal_form_send_email($form_entity, $valores, $attachments, $proceso, $mailsto);
   }
 
-/*
+  /*
   // Save it to API List coming soon
   if($toapi && $proceso){
     $url = $form_entity->url;
@@ -298,7 +298,7 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
     }
     dd($url);
   }
-*/
+  */
     
   if($proceso == TRUE){
     
@@ -312,6 +312,8 @@ function gcaba_drupal_form_render_form_submit($form, &$form_state) {
   return $form[$wrapperId];
 }
 
+
+
 /**
  * Implements hook_mail().
  */
@@ -319,9 +321,200 @@ function gcaba_drupal_form_mail($key, &$message, $params) {
   if ($key == 'gcaba_drupal_form_email') {
     $message['subject'] = $params['subject'];
     $message['body'] = $params['body'];
+    $message['params']['attachments'] = $params['attachments'];
     $message['headers'] = $params['headers'];
   }
 }
 
+/*
+ * Auxiliar: Validadores
+ */
+function _gcaba_drupal_form_validate_field($field_node, $form_field_name, $value, &$errors){
+  foreach (unserialize($field_node->validators) as $key1 => $value1) {
+    if($value1 != "0"){
+      switch ($value1) {
+        case 'REQUERIDO'://
+          if($field_node->type === "FILE") {
+            if (empty($_FILES['files']['name'][$form_field_name])) {
+              array_push($errors, t("Field <b>").$field_node->title. t("</b> is required."));
+            }
+          } else {
+            if (empty($value)){
+              array_push($errors, t("Field <b>").$field_node->title. t("</b> is required."));
+            }  
+          }
+          
+          break;
+        case 'URL':
+          if (!valid_url($value)){
+            array_push($errors, t("Field <b>").$field_node->title. t("</b> is not an URL."));
+          }
+          break;
+        case 'EMAIL':
+          if (!valid_email_address($value)){
+            array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a valid email address."));
+          }
+          break;
+        case 'NUMERIC':
+          if (!is_numeric($value)){
+            array_push($errors, t("Field <b>").$field_node->title. t("</b> must be a number."));
+          }
+          break;
+        case 'NON-NUMERIC':
+          if (is_numeric($value)){
+            array_push($errors, t("Field <b>").$field_node->title. t("</b> must not be a number."));
+          }
+          break;
+      } //END switch($value1)
+    } //end if($value1 != "0")
 
-?>
+  }
+}
+
+/*
+ * Auxiliar: guardar valores
+ */
+function _gcaba_drupal_form_get_value($key, $value, $field_node, $form_state, &$valores, &$archivos, &$mailsto){
+  if(is_array($value)){
+    $value = implode(' ', $value);
+  }
+  array_push($valores, array($field_node->title, $value));
+
+  
+  $field = $form_state['complete form'][$key];
+  //En caso de ser un archivo lo agrego al listado de archivos
+  if(isset($field['#type']) && $field['#type'] == "file"){
+    $archivos[] = $key;
+  }
+
+  //En caso de ser un mail adicional lo agrego al listado de mails
+  if($field_node->type == "SELECTTOMAIL"){
+    $mailsto[] = $value;
+  }
+
+}
+
+/*
+ * Auxiliar: guardar archivos subidos, si hay
+ */
+function _gcaba_drupal_form_save_files($archivos, &$attachments, &$form_state, &$errors){
+  foreach($archivos as $archivo) {
+    $file = file_save_upload($archivo);
+    if ($file) {
+      // Move the file into the Drupal file system.
+      if ($file = file_move($file, 'public://')) {
+      // Save the file for use in the submit handler.
+        $form_state['storage']['file'][] = $file;
+      }
+      else {
+        form_set_error('file', t("Failed to write the uploaded file to the site's file folder."));
+        array_push($errors, t("Failed to write the uploaded file to the site's file folder."));
+      }
+    }
+    else {
+      form_set_error('file', t('No file was uploaded.'));
+      array_push($errors, t('No file was uploaded.'));
+    }
+  }
+
+  $files = array();
+  foreach($form_state['storage']['file'] as $file){
+    $attachment = array(
+      'filecontent' => file_get_contents($file->uri),
+      'filename' => $file->filename,
+      'filemime' => $file->filemime,
+    );
+    $attachments[] = $attachment;
+    $files[] = $file;
+  }
+
+  foreach($files as $file){
+    file_delete($file, TRUE);
+  }
+
+}
+
+/*
+ * Auxiliar: enviar mail
+ */
+function _gcaba_drupal_form_send_email($form_entity, $valores, $attachments,&$proceso, $mailsto) {
+  //Emails del form
+  $emails = explode(",", trim( $form_entity->emails));
+  //Emails agregados por campos
+  $emails = array_merge($emails, $mailsto);
+
+  array_walk($emails, 'trim_value');
+
+  $body = "";
+  foreach ($valores as $key5 => $value5) {
+    $body .= utf8_decode($value5[0]). ": ".utf8_decode($value5[1])."\n";
+
+  }
+
+  foreach ($emails as $key => $email) {
+    // TODO Valido correo
+    $from = 'noreply@buenosaires.gob.ar';
+
+    $params = array(
+      'subject' => utf8_decode($form_entity->title),
+    );
+    $params['body'] = array(t($body));
+
+    $params['attachments'] = $attachments;
+
+    drupal_mail('gcaba_drupal_form', 'gcaba_drupal_form_email', $email, language_default(), $params, $from, TRUE);
+    
+    if (!sent){
+      $proceso == FALSE;
+    }
+  }
+}
+
+/**
+ * Agrega los fixs necesarios de jQuery para los drupal form ajax
+ */
+function _gcaba_drupal_form_jquery_fix(){
+  drupal_add_js('jQuery.extend({
+    handleError: function( s, xhr, status, e ) {
+          // If a local callback was specified, fire it
+          if ( s.error )
+              s.error( xhr, status, e );
+          // If we have some XML response text (e.g. from an AJAX call) then log it in the console
+          else if(xhr.responseText)
+              console.log(xhr.responseText);
+      }
+  });', 'inline');
+
+  drupal_add_js('jQuery.extend({
+    httpData: function( xhr, type, s ) {
+      var ct = xhr.getResponseHeader("content-type") || "",
+        xml = type === "xml" || !type && ct.indexOf("xml") >= 0,
+        data = xml ? xhr.responseXML : xhr.responseText;
+
+      if ( xml && data.documentElement.nodeName === "parsererror" ) {
+        jQuery.error( "parsererror" );
+      }
+
+      // Allow a pre-filtering function to sanitize the response
+      // s is checked to keep backwards compatibility
+      if ( s && s.dataFilter ) {
+        data = s.dataFilter( data, type );
+      }
+
+      // The filter can actually parse the response
+      if ( typeof data === "string" ) {
+        // Get the JavaScript object, if JSON is used.
+        if ( type === "json" || !type && ct.indexOf("json") >= 0 ) {
+          data = jQuery.parseJSON( data );
+
+        // If the type is "script", eval it in global context
+        } else if ( type === "script" || !type && ct.indexOf("javascript") >= 0 ) {
+          jQuery.globalEval( data );
+        }
+      }
+
+      return data;
+    }
+  });', 'inline');
+
+}

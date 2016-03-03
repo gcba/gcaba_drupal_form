@@ -72,6 +72,12 @@ function gcaba_drupal_form_schema() {
           'not null' => TRUE,
           'default' => 0,
         ),
+        'footer' =>array(
+          'type' => 'varchar',
+          'description' => "pie de pagina",
+          'length' => 2000,
+          'not null' => FALSE,
+        ),
       ),
     'primary key' => array('basic_id'),
   );
@@ -147,7 +153,7 @@ function gcaba_drupal_form_schema() {
           'not null' => FALSE,
           'default' => '',
         ),
-
+        /*
         'options' => array(
           'description' => 'Field options',
           'type' => 'varchar',
@@ -155,13 +161,27 @@ function gcaba_drupal_form_schema() {
           'not null' => FALSE,
           'default' => '',
         ),
-        
+        */
+        'options' => array(
+          'description' => 'Field options',
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => FALSE,
+        ),
+
         'created' => array(
           'description' => 'The Unix timestamp of the entity creation time.',
           'type' => 'int',
           'not null' => TRUE,
           'default' => 0,
         ),
+        'openIDname' => array(
+          'description' => 'Field OpenID',
+          'type' => 'varchar',
+          'length' => 200,
+          'not null' => FALSE,
+          'default' => '',
+          ),
       ),
     'primary key' => array('basic_id'),
   );
@@ -169,6 +189,55 @@ function gcaba_drupal_form_schema() {
   return $schema;
 }
 
+/**
+ * Add newcol field to {gcaba_drupal_form_} table.
+ */
+function gcaba_drupal_form_update_7102() {
+  $spec = array(
+    'type' => 'varchar',
+    'description' => "pie de pagina",
+
+    'length' => 2000,
+    'not null' => FALSE,
+  );
+  db_add_field( 'gcaba_forms_forms', 'footer', $spec);
+}
+
+/**
+ * Edit field at {gcaba_forms_fields} table.
+ */
+function gcaba_drupal_form_update_7103(){
+  $spec = array(
+          'description' => 'Field options',
+          'type' => 'text',
+          'size' => 'medium',
+          'not null' => FALSE,
+        );
+  db_change_field('gcaba_forms_fields', 'options', 'options', $spec);
+}
+
+/**
+ * Edit field at {gcaba_forms_fields} table.
+ */
+function gcaba_drupal_form_update_7104(){
+  $spec = array(
+          'description' => 'Field options',
+          'type' => 'text',
+          'size' => 'big',
+          'not null' => FALSE,
+        );
+  db_change_field('gcaba_forms_fields', 'options', 'options', $spec);
+}
+
+function gcaba_drupal_form_update_7105(){
+  $spec = array(
+           'type' => 'varchar',
+           'description' => "Field OpenID",
+           'length' => 100,
+           'not null' => FALSE,
+    );
+  db_add_field( 'gcaba_forms_fields', 'openIDname', $spec);
+}
 
 /*
  * Implements hook_uninstall().

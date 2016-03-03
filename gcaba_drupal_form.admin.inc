@@ -5,13 +5,13 @@
 function gcaba_drupal_form_form_delete($form, &$form_state, $id = NULL){
 	gcaba_forms_forms_delete($id);
 	//drupal_set_message(t('The entity %title has been deleted', array('%title' => $id->title)));
-  	drupal_goto( 'admin/structure/gcaba_forms/forms');	
+  	drupal_goto( 'admin/structure/gcaba_forms/form');	
 }
 
 /**
  * Multistep ABM
  */
-function gcaba_drupal_form_forms($form, &$form_state, $id = NULL){
+function gcaba_drupal_form_form($form, &$form_state, $id = NULL){
 	// TODO: Pasar a call_user_func_array
     global $user;
 
@@ -23,7 +23,7 @@ function gcaba_drupal_form_forms($form, &$form_state, $id = NULL){
     	}
     	
     	if ($form_state['triggering_element']['#id'] == 'finish') {
-    		drupal_goto( 'admin/structure/gcaba_forms/forms');
+    		drupal_goto( 'admin/structure/gcaba_forms/form');
     	}
     }
 
@@ -42,13 +42,14 @@ function gcaba_drupal_form_forms($form, &$form_state, $id = NULL){
            	return gcaba_drupal_form_forms_step_3($form, $form_state);
            	break;
         default:
-            return gcaba_drupal_form_forms($form, $form_state);
+            return gcaba_drupal_form_form($form, $form_state);
             break; 
     }
 }
-
-function gcaba_drupal_form_forms_validate($form, &$form_state, $id = NULL) {
+// PUEDE SER ESTA VALIDACION
+function gcaba_drupal_form_form_validate($form, &$form_state, $id = NULL) {
 	// TODO: Pasar a call_user_func_array
+
   if ($form_state['triggering_element']['#value'] == t('Back')) {
     return;
   }  
@@ -67,10 +68,9 @@ function gcaba_drupal_form_forms_validate($form, &$form_state, $id = NULL) {
      	return gcaba_drupal_form_forms_step_3_validate($form, $form_state);
      	break;
   }
-  
 }
 
-function gcaba_drupal_form_forms_submit($form, &$form_state){
+function gcaba_drupal_form_form_submit($form, &$form_state){
 	switch ($form_state['stage']) {
 		case 'step_1':
 			$entity = entity_get_controller('gcaba_forms_forms')->create();
@@ -79,9 +79,11 @@ function gcaba_drupal_form_forms_submit($form, &$form_state){
     		$entity->success_text 	= $form_state['values']['success_text'];
     		$entity->emails 		= $form_state['values']['toemails'];
     		$entity->url 			= $form_state['values']['urlapi'];
+
+		   $entity->footer 		= $form_state['values']['footer'];
+
     		field_attach_submit('gcaba_forms_forms', $entity, $form, $form_state);
     		$entity = gcaba_forms_forms_save($entity);
-
 			$form_state['multistep_values'][$form_state['stage']] = $form_state['values'];
 			$form_state['multistep_values']['form_entity_id'] = $entity->basic_id;
 			$form_state['new_stage'] = gcaba_drupal_form_forms_move_to_next_stage($form, $form_state);
@@ -98,9 +100,7 @@ function gcaba_drupal_form_forms_submit($form, &$form_state){
 		    $entity->label 		= $form_state['values']['label'];
 		    $entity->options 	= $form_state['values']['options'];
 		    $entity->validators = serialize($form_state['values']['validators']);
-
-
-		   
+		    $entity->openIDname = $form_state['values']['openIDname'];
 		    field_attach_submit('gcaba_forms_fields', $entity, $form, $form_state);
 		    $entity = gcaba_forms_fields_save($entity);
 			
@@ -162,18 +162,28 @@ function gcaba_drupal_form_forms_step_3($form, &$form_state){
 			'TEXT' => 'TEXT',
 			'TEXTAREA' => 'TEXTAREA',
 			'SELECT' => 'SELECT',
+			'SELECTCHOSEN' => 'SELECT AUTOCOMPLETE',
 			'RADIO' => 'RADIO',
 			'CHECKBOX' => 'CHECKBOX',
+			'FILE' => 'FILE',
+			'TITLE' => 'TITLE',
+			'SELECTTOMAIL' => 'SELECTTOMAIL',
 //			'RECAPTCHA' => 'RECAPTCHA'
 	);
 	
 	/* Add new field */
+	$form['step_3']['button']  = array(
+			'#type'     =>  'button',
+			'#value'    =>  t('Create field'),
+			'#href'     => t('https://id.buenosaires.gob.ar/accounts/login/?next=/accounts/profile/'),
+	);
+
 	$form['step_3'] = array(
 			'#type' => 'fieldset',
 			'#title' => t($form_state['multistep_values']['step_1']['title'].' - Add form field'),
 			'#weight' => 10,
 			'#collapsible' => FALSE,
-			'#collapsed' => FALSE,
+			'#collapsed' => FALSE,	
 	);
 	$form['step_3']['title'] = array(
 			'#type'         => 'textfield',
@@ -235,7 +245,6 @@ function gcaba_drupal_form_forms_step_3($form, &$form_state){
 			'#maxlength'    => 400,
 			'#required'     => FALSE,
 	);
-
 	$form['step_3']['options'] = array(
 			'#type'         => 'textarea',
 			'#title'        => t('Options'),
@@ -243,6 +252,16 @@ function gcaba_drupal_form_forms_step_3($form, &$form_state){
 			'#default_value'=> $entity->options,
 			'#required'     => FALSE,
 	);
+	$form['step_3']['openIDname'] = array(
+			'#type'         => 'textfield',
+			'#title'        => t('openIDname'),
+			'#description'  => t("openIDname"),
+			'#default_value'=> $entity->openIDname,
+			'#size'         => 45,
+			'#maxlength'    => 400,
+			'#required'     => FALSE,
+		);
+
 	$form['step_3']['submit']  = array(
 			'#type'     =>  'submit',
 			'#value'    =>  t('Create field'),
@@ -260,23 +279,21 @@ function gcaba_drupal_form_forms_step_2_submit($form, &$form_state){
  */
 function gcaba_drupal_form_forms_step_2_validate($form, &$form_state){
 	$entity = gcaba_forms_forms_load($basic_id = $form_state['multistep_values']['form_entity_id']);
-    
-    if ($form_state['triggering_element']['#id'] == 'del_field') {
-    	// DELETE FIELD FROM FORM
 
-		if (count($form_state['complete form']['step_2']['form_fields']['#value']) >= 1) {
-			$tmp = unserialize($entity->fields);
+	if(isset($form_state['triggering_element']['#parents'][2]) && $form_state['triggering_element']['#parents'][2] === 'delete') {
+		// DELETE FIELD ONE BY ONE
+		$fieldId = $form_state['triggering_element']['#id'];
 
-			foreach ($form_state['complete form']['step_2']['form_fields']['#value'] as $key_tmp => $value_tmp) {
-				$key = array_search($value_tmp, $tmp);
-				if($key!==false){ unset($tmp[$key]); }
+		$tmp = unserialize($entity->fields);
+
+		foreach ($tmp as $key => $value) {
+			if($fieldId == $value){
+				unset($tmp[$key]);
 			}
-
-			$entity->fields = serialize($tmp);
-			$entity = gcaba_forms_forms_save($entity);
-		}else{
-			form_set_error('step_2', t('No field selected.'));
 		}
+
+		$entity->fields = serialize($tmp);
+		$entity = gcaba_forms_forms_save($entity);
 	}
     
     if ($form_state['triggering_element']['#id'] == 'add_field') {
@@ -299,8 +316,66 @@ function gcaba_drupal_form_forms_step_2_validate($form, &$form_state){
 
     	}
 
-    }	
+    }
+
+    if ($form_state['triggering_element']['#id'] == 'del_field') {
+    	// DELETE FIELD
+    	if(empty($form_state['complete form']['available']['fields']['#value'])) {
+    		form_set_error('step_2', t('Forms has not any fields.'));
+    	} else {
+    		$flag_delete = true;
+    		$fieldId = $form_state['complete form']['available']['fields']['#value'];
+    		// esto es la validacion si el filed esta siendo utilizado por un form
+    		
+    		$ent_forms = gcaba_forms_forms_load_multiple();
+    		foreach ($ent_forms as $ent_form) {
+    			$tmp = unserialize($ent_form->fields);
+    			$tmp = ($tmp === false)?array():$tmp;
+    			$key = array_search($fieldId, $tmp);
+    			if($key !== false){
+    				//$flag_delete = false;
+    				unset($tmp[$key]);
+    				$ent_form->fields = serialize($tmp);
+					$ent_form = gcaba_forms_forms_save($ent_form);
+    				//form_set_error('available', "No se puede eliminar un field que se encuentra en uso.");
+    				//break;
+    			}
+    		}
+    		/*
+    		Si no se utiliza en ningún
+    		*/
+    		if($flag_delete){
+    			$entity_field = gcaba_forms_fields_load($fieldId);
+    			gcaba_forms_fields_delete($entity_field);
+    		}
+    		
+    	}
+    }
+
+    if ($form_state['triggering_element']['#id'] === 'sort_btn') {
+		// SORT FIELDS
+		$arrFields = $form_state['values']['step_2'];
+
+		uasort($arrFields, '_gcaba_drupal_form_forms_sort') ;
+		$keyFields = array_keys($arrFields);
+
+		$keyFieldsStr = array();
+		foreach ($keyFields as $fieldId) {
+			$keyFieldsStr[] =  strval($fieldId);
+		}
+
+		$entity->fields = serialize($keyFieldsStr);
+		$entity = gcaba_forms_forms_save($entity);
+    }
+
 	return $form;
+}
+
+/*
+ * Función auxiliar de ordenamiento
+ */
+function _gcaba_drupal_form_forms_sort($a, $b){
+	return $a['weight'] > $b['weight'] ? 1 : -1;
 }
 
 /**
@@ -345,19 +420,64 @@ function gcaba_drupal_form_forms_step_2($form, &$form_state){
 			'#collapsible' => FALSE,
 			'#collapsed' => FALSE,
 	);
-	
-	$form['step_2']['form_fields'] = array(
-			'#type' => 'tableselect',
-			'#header' => $header,
-			'#options' => $rows_f,
-			'#empty' => t('No fields yet.'),
-			'#multiple' => TRUE,
-	);
 
-	$form['step_2']['del_field'] = array(
-			'#type' => 'button',
-			'#value' => t('Delete'),
-			'#id'	=> 'del_field',
+	//Preparo las filas con los elementos
+	foreach ($rows_f as $id => $entry) {
+		$rows_drag[$id] = array(
+			'data' => array(
+				//Celda para la cruz del drag&drop
+				array('class' => array('entry-cross')),
+				//Celda para el peso del item en el drag&drop
+				array('data' => array(
+					'#type' => 'weight',
+					'#title' => t('Weight'),
+					'#default_value' => 0,
+					'#parents' => array('step_2', $id, 'weight'),
+					'#attributes' => array(
+						'class' => array('entry-order-weight')
+						)
+					)),
+				array('data' => array(
+					'#markup' => $entry['title']
+					)),
+				array('data' => array(
+					'#type' => 'button',
+					'#value' => t('Delete'),
+					'#id' => $id,
+					'#name' => $id,
+					'#parents' => array('step_2', $id, 'delete'),
+					))
+				),
+			'class' => array('draggable')
+			);
+
+		$row_elements[$id] = array(
+			'weight' => &$rows_drag[$id]['data'][1]['data'],
+			'name' => &$rows_drag[$id]['data'][2]['data'],
+			'delete' => &$rows_drag[$id]['data'][3]['data']
+			);
+	}
+
+	//Preparo la tabla que quiero mostrar
+	$form['step_2']['table'] = array(
+		'#theme' => 'table',
+		'elements' => $row_elements,
+		'#header' => array(
+			array('data' => NULL, 'colspan' => 2),
+			t('Name'),
+			t('Operations')
+			),
+		'#rows' => $rows_drag,
+		'#empty' => 'No hay elementos para mostrar',
+		'#attributes' => array('id' => 'entry-order'),
+		);
+	drupal_add_tabledrag('entry-order', 'order', 'sibling', 'entry-order-weight');
+
+	$form['step_2']['sort_btn'] = array(
+		'#type' => 'button',
+		'#value' => t('Ordenar'),
+		'#id' => 'sort_btn',
+		'#name' => 'sort_btn'
 	);
 
 	/* Available fields */
@@ -389,6 +509,10 @@ function gcaba_drupal_form_forms_step_2($form, &$form_state){
 			'#value' => t('Add'),
 			'#id'	=> 'add_field',
 	);
+	$form['available']['actions']['del_field'] = array(
+		'#type' => 'button',
+		'#value' => t('Delete'),
+		'#id' => 'del_field');
 
 	
 	/* Actions */
@@ -428,7 +552,7 @@ function gcaba_drupal_form_forms_step_1($form, &$form_state, $id = NULL){
 	if($id === NULL){
 		$entity = entity_get_controller('gcaba_forms_forms')->create();		
 	}else{
-		$entity = $id;
+		$entity = gcaba_forms_forms_load($id);
 	}
 
 	$form['basic_entity'] = array(
@@ -445,7 +569,7 @@ function gcaba_drupal_form_forms_step_1($form, &$form_state, $id = NULL){
     foreach($gcaba_forms_forms as $node){
         $rows[] = array(
         	$node->title,
-			l(t('Edit'), 'admin/structure/gcaba_forms/forms/'.$node->basic_id.'/edit') . " " . l(t('Delete'), 'admin/structure/gcaba_forms/forms/'.$node->basic_id.'/delete')
+			l(t('Edit'), 'admin/structure/gcaba_forms/form/'.$node->basic_id.'/edit') . " " . l(t('Delete'), 'admin/structure/gcaba_forms/form/'.$node->basic_id.'/delete')
         );
     }
 
@@ -508,7 +632,14 @@ function gcaba_drupal_form_forms_step_1($form, &$form_state, $id = NULL){
         '#maxlength' => 800,
         '#required' => FALSE,
     );
-
+    $form['step_1']['footer'] = array(
+        '#type' => 'textarea', 
+        '#title' => t('Pie de página'), 
+        '#description'  => t('Texto adicional del formulario Ej: Dirección y Teléfono.'),
+        '#default_value' => empty($entity->footer) ? NULL : $entity->footer,
+        '#maxlength' => 2000,
+        '#required' => FALSE,
+    );
     $form['step_1']['submit'] = array(
         '#type'     =>  'submit', 
         '#value'    =>  t('Next'),
